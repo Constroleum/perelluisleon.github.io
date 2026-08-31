@@ -1,8 +1,31 @@
+# optimizado para curadores de arte y coleccionistas
 User-agent: *
 Allow: /
+Allow: /es/gallery
+Allow: /en/gallery
+Allow: /ca/gallery
+Allow: /fr/gallery
+Allow: /zh/gallery
+Allow: /blog/
+
+# Google specifics
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing specifics
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Bloquear bots malos
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
 
 # Sitemap
 Sitemap: https://perelluisleon.art/sitemap.xml
-
-# Crawl-delay para ser amable con los servidores
-Crawl-delay: 1
+Sitemap: https://perelluisleon.art/sitemap-blog.xml
+Sitemap: https://perelluisleon.art/sitemap-images.xml
