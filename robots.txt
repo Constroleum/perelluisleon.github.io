@@ -27,5 +27,4 @@ Disallow: /
 
 # Sitemap
 Sitemap: https://perelluisleon.art/sitemap.xml
-Sitemap: https://perelluisleon.art/sitemap-blog.xml
 Sitemap: https://perelluisleon.art/sitemap-images.xml
