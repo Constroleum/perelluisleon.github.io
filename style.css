@@ -40,12 +40,12 @@ dialog{border:0;padding:0;color:var(--ink)}dialog::backdrop{background:rgba(43,2
 .row{display:flex;flex-wrap:wrap;gap:.6rem}
 .ok{list-style:none;padding:0;display:grid;gap:.4rem;color:var(--mute);font-size:.95rem}.ok li:before{content:"✓";color:var(--wine);margin-right:.6rem;font-weight:700}
 .nv{display:flex;justify-content:space-between;margin-top:.6rem}.nv button{background:none;border:0;color:var(--mute);padding:.4rem 0}
-.wall{position:relative;flex:none;background:#EADCE0;overflow:hidden;width:calc(300*var(--k));height:calc(var(--H)*var(--k))}
+.wall{position:relative;flex:none;background:#EADCE0;overflow:hidden;width:calc(var(--Wd)*var(--k));height:calc(var(--H)*var(--k))}
 .wall>*{position:absolute}
 .floor{left:0;right:0;bottom:0;height:calc(15*var(--k));background:#C9B8BD}
 .sofa{left:calc(30*var(--k));bottom:calc(15*var(--k));width:calc(200*var(--k));height:calc(85*var(--k));background:linear-gradient(#B98A97 0 47%,#8C5F6D 47%);border-radius:calc(10*var(--k))}
 .art{bottom:calc(135*var(--k));box-shadow:0 6px 20px rgba(0,0,0,.3)}.art img{display:block;width:100%;height:100%;object-fit:cover}
-.me{left:calc(245*var(--k));bottom:calc(15*var(--k));width:calc(40*var(--k));height:calc(175*var(--k));background:#2B1B21;border-radius:calc(20*var(--k)) calc(20*var(--k)) calc(6*var(--k)) calc(6*var(--k));opacity:.85;clip-path:polygon(35% 0,65% 0,70% 14%,100% 24%,100% 100%,0 100%,0 24%,30% 14%)}
+.me{bottom:calc(15*var(--k));width:calc(40*var(--k));height:calc(175*var(--k));background:#2B1B21;border-radius:calc(20*var(--k)) calc(20*var(--k)) calc(6*var(--k)) calc(6*var(--k));opacity:.85;clip-path:polygon(35% 0,65% 0,70% 14%,100% 24%,100% 100%,0 100%,0 24%,30% 14%)}
 .wl{font-size:.85rem;color:var(--mute);margin-top:.8rem}
 .ci{display:grid;grid-template-columns:72px 1fr auto;gap:.9rem;align-items:center;padding:.9rem 0;border-bottom:1px solid var(--line)}
 .ci img{width:72px;height:72px;object-fit:cover;border-radius:4px}
@@ -101,3 +101,5 @@ body[data-p=home] .card{flex:0 0 min(270px,74vw);scroll-snap-align:start}
 .cv{position:absolute;top:38%;z-index:2;width:2.8rem;height:2.8rem;border-radius:50%;border:0;background:#fff;color:var(--deep);font-size:1.2rem;box-shadow:0 2px 12px rgba(43,27,33,.3);transition:background .2s,color .2s}
 .cv:hover{background:var(--wine);color:#fff}.cv[data-dir="-1"]{left:clamp(.4rem,2vw,1.4rem)}.cv[data-dir="1"]{right:clamp(.4rem,2vw,1.4rem)}
 @media(max-width:700px){.cv{display:none}}
+
+.card .im.wide img{object-fit:contain;background:#EBDDE1}
