@@ -2,7 +2,7 @@
    mode 'mailto': el pedido se envía por correo (funciona hoy).
    mode 'stripe': hace POST a endpoint con { items, customer, lang } y redirige a la url que devuelva
    (el servidor debe calcular el precio por su cuenta a partir de los ids). */
-const C={price:3000,email:'perelluisleon@gmail.com',mode:'mailto',endpoint:''};
+const C={price:3000,email:'ilust.medical@gmail.com',mode:'mailto',endpoint:''};
 /* Precio por defecto C.price; excepciones por id de obra (el Worker usa los mismos precios) */
 const PR={'gat-a-la-finestra':1400,'laberint-musical':4500,'1-o-17':4500},pr=w=>PR[w.id]||C.price,sum=a=>a.reduce((s,w)=>s+pr(w),0);
 const S={
