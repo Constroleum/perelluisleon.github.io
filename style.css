@@ -116,3 +116,27 @@ body[data-p=home] .card{flex:0 0 min(270px,74vw);scroll-snap-align:start}
 a.btn{text-decoration:none;display:inline-block}
 
 .exl li{grid-template-columns:minmax(7rem,12rem) 1fr}@media(max-width:700px){.exl li{grid-template-columns:1fr;gap:.2rem}}
+
+/* SEO: enlaces de tarjetas, página de obra y textos introductorios */
+.card .im,.card b a{text-decoration:none;color:inherit}
+.wint{padding:0 clamp(1rem,4vw,3rem) 1.4rem;max-width:72ch;color:var(--mute)}
+.bc{padding:1rem clamp(1rem,4vw,3rem) 0;color:var(--mute);font-size:.92rem}
+.bc a{color:var(--mute)}
+.wp{min-height:0}
+.wp .pic{position:static;height:auto;min-height:50vh}
+.wp .inf h1{font-size:clamp(2rem,4vw,3rem)}
+.rel{padding-bottom:1rem}
+#rel{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.6rem 1.2rem;padding:0 clamp(1rem,4vw,3rem) 3rem}
+.hub{max-width:760px;margin:0 auto;padding:clamp(3rem,12vh,8rem) 1.5rem;text-align:center}
+.hub h1{font-size:clamp(2.6rem,8vw,5rem);color:var(--deep)}
+.hub p{color:var(--mute);margin:.8rem 0}
+.hub ul{list-style:none;padding:0;display:grid;gap:1rem;margin-top:2.5rem}
+.hub li a{display:block;padding:1rem;border:1.5px solid var(--line);border-radius:10px;color:var(--ink);text-decoration:none}
+.hub li a:hover{border-color:var(--hi)}
+.hub li b{display:block;font:500 1.3rem 'Bricolage Grotesque',system-ui,sans-serif}
+.inf a,.bc a:hover{color:var(--hi)}
+.faq{padding:0 clamp(1rem,4vw,3rem) 3rem;max-width:900px}
+.faq .sec{padding-left:0}
+.faq details{border-bottom:1px solid var(--line);padding:.9rem 0}
+.faq summary{cursor:pointer;font-weight:600}
+.faq p{margin:.6rem 0 0;color:var(--mute);max-width:70ch}
