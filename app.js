@@ -1,10 +1,10 @@
-/* ═══ CONFIGURACIÓN ═══ precio por pieza, correo de pedidos y modo de pago.
-   mode 'mailto': el pedido se envía por correo (funciona hoy).
-   mode 'stripe': hace POST a endpoint con { items, customer, lang } y redirige a la url que devuelva
-   (el servidor debe calcular el precio por su cuenta a partir de los ids). */
-const C={price:3000,email:'ilust.medical@gmail.com',mode:'mailto',endpoint:''};
+/* ═══ CONFIGURACIÓN ═══ precio por pieza, correo de pedidos y pago.
+   endpoint vacío  → el pedido se envía por correo (mailto).
+   endpoint con la URL del Worker de Stripe (ver _stripe/LEEME.md) → pago con tarjeta en Stripe Checkout.
+   El Worker vuelve a calcular precios y envío por su cuenta: nunca se fía de lo que mande el navegador. */
+const C={price:3000,email:'ilust.medical@gmail.com',endpoint:''};
 /* Precio por defecto C.price; excepciones por id de obra (el Worker usa los mismos precios) */
-const PR={'gat-a-la-finestra':1400,'laberint-musical':4500,'1-o-17':4500,'parella-en-blaus':2500,'reflexos':2500,'llagrimes-de-sang':2500,'dona-nua':2500},pr=w=>PR[w.id]||C.price,sum=a=>a.reduce((s,w)=>s+pr(w),0);
+const PR={'fuji-primavera':1400,'fuji-estiu':1400,'fuji-tardor':1400,'fuji-hivern':1400,'gat-a-la-finestra':1400,'laberint-musical':4500,'1-o-17':4500,'parella-en-blaus':2500,'reflexos':2500,'llagrimes-de-sang':2500,'dona-nua':2500},pr=w=>PR[w.id]||C.price,sum=a=>a.reduce((s,w)=>s+pr(w),0);
 const S={
 es:{h1:'Pinturas originales, listas para tu pared',sub:'Cada obra es un original único, pintado en acrílico sobre lienzo por Pere Lluís León en Premià de Mar (Barcelona). Desde 1.400 € y con envío internacional.',go:'Ver las obras',all:'Todas',av:'Disponibles',sz:'Tamaño',s0:'Todos los tamaños',s1:'Pequeñas (hasta 80 cm)',s2:'Medianas (81–120 cm)',s3:'Grandes (más de 120 cm)',w:'obras',sold:'Vendida',tech:'Acrílico sobre lienzo',add:'Añadir a la cesta',inn:'Ya está en tu cesta',buy:'Comprar ahora',sc:'Ver a escala real',pl:'Ver la obra sola',wl:'La obra se muestra a escala junto a un sofá de 2 m y una persona de 1,75 m.',u1:'Original único: no existen copias',u2:'Firmada por el artista',u3:'Envío internacional: 30 € a España, 200 € a la UE y al Reino Unido, 400 € al resto del mundo',pv:'Anterior',nx:'Siguiente',cart:'Cesta',em:'Tu cesta está vacía. Elige una obra que te guste.',rm:'Quitar',tot:'Total',ship:'Envío por pedido: 30 € a España, 200 € a la UE y al Reino Unido, y 400 € al resto del mundo.',co:'Finalizar compra',nm:'Nombre',mail:'Correo',ctry:'País de envío',msg:'Mensaje (opcional)',snd:'Enviar pedido',bk:'Volver a la cesta',cl:'Cerrar',sent:'Se ha abierto tu correo con el pedido. Envíalo y te respondemos con el envío y el pago.',err:'No se pudo iniciar el pago. Inténtalo de nuevo.',bio:'Pintor expresionista mediterráneo. Vive en Premià de Mar y estudió en la Escola de la Llotja y la Massana. Alterna los trabajos de [ilustración médica] con las exposiciones de pintura.',ct:'Contacto'},
 ca:{h1:'Pintures originals, a punt per a la teva paret',sub:'Cada obra és un original únic, pintat en acrílic sobre tela per Pere Lluís León a Premià de Mar (Barcelona). Des de 1.400 € i amb enviament internacional.',go:'Veure les obres',all:'Totes',av:'Disponibles',sz:'Mida',s0:'Totes les mides',s1:'Petites (fins a 80 cm)',s2:'Mitjanes (81–120 cm)',s3:'Grans (més de 120 cm)',w:'obres',sold:'Venuda',tech:'Acrílic sobre tela',add:'Afegir a la cistella',inn:'Ja és a la teva cistella',buy:'Comprar ara',sc:'Veure a escala real',pl:'Veure l’obra sola',wl:'L’obra es mostra a escala amb un sofà de 2 m i una persona d’1,75 m.',u1:'Original únic: no n’existeixen còpies',u2:'Signada per l’artista',u3:'Enviament internacional: 30 € a Espanya, 200 € a la UE i al Regne Unit, 400 € a la resta del món',pv:'Anterior',nx:'Següent',cart:'Cistella',em:'La teva cistella és buida. Tria una obra que t’agradi.',rm:'Treure',tot:'Total',ship:'Enviament per comanda: 30 € a Espanya, 200 € a la UE i al Regne Unit, i 400 € a la resta del món.',co:'Finalitzar la compra',nm:'Nom',mail:'Correu',ctry:'País d’enviament',msg:'Missatge (opcional)',snd:'Enviar comanda',bk:'Tornar a la cistella',cl:'Tancar',sent:'S’ha obert el teu correu amb la comanda. Envia’l i et responem amb l’enviament i el pagament.',err:'No s’ha pogut iniciar el pagament. Torna-ho a provar.',bio:'Pintor expressionista mediterrani. Viu a Premià de Mar i va estudiar a l’Escola de la Llotja i la Massana. Alterna els treballs d’[il·lustració mèdica] amb les exposicions de pintura.',ct:'Contacte'},
@@ -38,101 +38,141 @@ const EXK={"es":{"smallf":"Exposición colectiva de pequeño formato","coll":"Ex
 /* Exposiciones: [inicio, fin (ISO) | año, nombre (o @clave), lugar, descripción (clave)] — las fechas se formatean solas en cada idioma */
 const EXD=[["2024","","Neopristo · Art·Tek Gallery","Barcelona",""],["2023-12-12","2024-01-08","@smallf","",""],["2023-10-24","2023-11-20","Galería Escolà Mar","Barcelona",""],["2022-09-03","2022-09-29","BCM Galería","Barcelona","coll"],["2022-08-02","2022-08-27","Sala de Exposiciones Ajuntament Vell de Begur","Begur",""],["2022-05-03","2022-05-28","Centro Cultural Calisay","Arenys de Mar",""],["2022-04-04","2022-04-30","Sala de Exposiciones del Ayuntamiento de Llançà","Llançà",""],["2021-12-03","2021-12-30","Galería de Arte CT","Reus",""],["2021-10-15","2021-11-06","Sala de Exposiciones Casa Saladrigas · Ayuntamiento de Blanes","Blanes",""],["2021-07-01","2021-08-31","Sala de Exposiciones del Ayuntamiento de Calella","Calella",""],["","","Facultad de Medicina de Barcelona","Barcelona","medsurg"],["","","Hospital Clínic de Barcelona","","medthemes"],["","","Hospital Vall d'Hebron","Barcelona","abstract"],["","","Parc Taulí","Sabadell","medart"],["","","Colegio Oficial de Médicos de Barcelona","","medsurg"],["","","Biblioteca de la Facultad de Medicina de Girona","Girona","medanat"],["","","Colegio Oficial de Médicos de Girona","","medart"],["","","Casa Museo Irla","Sant Feliu de Guíxols","absexp"],["","","Premiart","Premià de Mar","absexp"],["","","Cartón","Barcelona","absexp"],["","","Sala Rusiñol","Sant Cugat del Vallès",""],["","","@fairs","Figueres · Sant Antoni de Calonge · Sant Feliu de Guíxols · Canet de Mar",""],["","","@salon","Perpignan",""],["","","@agbar","Barcelona","sel"],["","","@prize","",""]];
 const SEG={es:{h:'/es/',w:'/es/obras/',a:'/es/artista/',c:'/es/contacto/'},ca:{h:'/ca/',w:'/ca/obres/',a:'/ca/artista/',c:'/ca/contacte/'},en:{h:'/en/',w:'/en/works/',a:'/en/artist/',c:'/en/contact/'},fr:{h:'/fr/',w:'/fr/oeuvres/',a:'/fr/artiste/',c:'/fr/contact/'}};
-const $=s=>document.querySelector(s),e=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const LOC={es:'es-ES',ca:'ca-ES',en:'en-GB',fr:'fr-FR'};
-let lang='es',cart=[],F={c:'all',z:'0'},scaled=false,step=0;
-lang=document.documentElement.dataset.l||'';try{if(!lang)lang=localStorage.pll_lang||'';cart=JSON.parse(localStorage.pll_cart2||'[]')}catch(_){}if(!lang)lang=(navigator.language||'es').slice(0,2);
-if(!S[lang])lang='es';
-const W=window.WORKS,by=Object.fromEntries(W.map(w=>[w.id,w]));cart=cart.filter(i=>by[i]&&!by[i].s);
-const cname=c=>{try{return new Intl.DisplayNames([lang],{type:'region'}).of(c)}catch(_){return c}};
-const ctry=()=>['ES',...[...EU,...OT].sort((a,b)=>cname(a).localeCompare(cname(b),lang))].map(c=>`<option value="${c}">${e(cname(c))}</option>`).join('');
-function updSum(){const s=$('#fc');if(!s)return;const n=sum(cart.map(i=>by[i])),h=ship(s.value);$('#sum').textContent=`${fmt(n)} + ${t('shp')} ${fmt(h)} = ${t('tot')} ${fmt(n+h)}`}
-const t=k=>S[lang][k],fmt=n=>new Intl.NumberFormat(LOC[lang],{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
-const save=()=>{try{localStorage.pll_cart2=JSON.stringify(cart)}catch(_){}};
-const desc=w=>w.d[lang]||'';const alt=w=>`${w.t}${desc(w)?' — '+desc(w):''} · Pere Lluís León, ${dm(w)}`;
-const sz=w=>{const m=Math.max(w.w,w.h);return m<=80?'1':m<=120?'2':'3'};
-const dm=w=>w.dm||`${w.w} × ${w.h} cm`;
-const P=document.body.dataset.p,FEAT=['laberint-musical','essencia-carmesi','el-crit','la-sirena','condicio-humana','gat-a-la-finestra','geisha-1','geisha-2'];
-const list=()=>P==='home'?FEAT.map(i=>by[i]).filter(Boolean):W.filter(w=>(F.c==='all'||(F.c==='av'?!w.s:w.c===F.c))&&(F.z==='0'||sz(w)===F.z)).sort((a,b)=>a.s-b.s);
 
-function shell(){
- document.documentElement.lang=lang;
- const nv=[['home',SEG[lang].h],['works',SEG[lang].w],['artist',SEG[lang].a],['contact',SEG[lang].c]];
- $('#hd').innerHTML=`<header class="top"><a class="brand" href="${SEG[lang].h}"><img class="logo" src="/img/logo.png" alt=""><span>Pere Lluís León</span></a><nav class="nav">${nv.map(n=>`<a href="${n[1]}"${P===n[0]?' aria-current="page"':''}>${t(n[0])}</a>`).join('')}<a href="${MED}" target="_blank" rel="noopener">${t('med')}</a></nav><div class="tools"><select id="lang" aria-label="Language"><option value="es">Español</option><option value="ca">Català</option><option value="en">English</option><option value="fr">Français</option></select><button class="btn" id="cb"></button></div></header>`;
- $('#lang').value=lang;$('#cb').textContent=t('cart')+(cart.length?' ('+cart.length+')':'');
- if(!document.documentElement.dataset.l)document.title=(P==='home'?'':t(P)+' — ')+'Pere Lluís León';else try{localStorage.pll_lang=lang}catch(_){}
- [['go',SEG[lang].w],['more',SEG[lang].w]].forEach(a=>{const x=$('#'+a[0]);if(x)x.href=a[1]});
- const set=(id,k)=>{const x=$('#'+id);if(x)x.textContent=t(k)};
- [['h1','h1'],['sub','sub'],['go','go'],['ft2','feat'],['more','more'],['bt','artist'],['b1','b1'],['b2','b2'],['bc','bc'],['ct1','contact'],['cin','cin'],['sm','sm'],['lb1','nm'],['lb2','mail'],['lb3','msg'],['hcol','col'],['tt','tt'],['tp','tp']].forEach(a=>set(a[0],a[1]));
- const ci=$('#cl');if(ci)ci.innerHTML=`<li><b>${t('mail')}</b><a href="mailto:${C.email}">${C.email}</a></li><li><b>${t('tel')}</b><a href="tel:+34937512087">+34 93 751 20 87</a></li><li><b>${t('st')}</b>Premià de Mar, Barcelona</li><li><b>${t('hr')}</b>${t('hrv')}</li><li><a href="https://instagram.com/perelluisleon">Instagram</a> · <a href="https://facebook.com/perelluisleon">Facebook</a></li>`;
- $('#ft').innerHTML=`<footer><div><b>Pere Lluís León</b><p>${lk(t('bio'))}</p></div><div><b>${t('contact')}</b><p><a href="mailto:${C.email}">${C.email}</a><br><a href="https://instagram.com/perelluisleon">Instagram</a> · <a href="https://facebook.com/perelluisleon">Facebook</a></p></div></footer>`;
- document.querySelectorAll('.cv').forEach((b,i)=>b.setAttribute('aria-label',t(i?'nx':'pv')));
- const hv=$('#hv');if(hv&&matchMedia('(prefers-reduced-motion: reduce)').matches)hv.pause()
- const st=$('#st');if(st){const q=STMT[lang];st.innerHTML=q.slice(0,3).map(p=>`<p>${e(p)}</p>`).join('')+`<p class="sig">${e(q[3])}</p>`}
- const bb=$('#bb');if(bb){const B=BIO[lang];bb.innerHTML=`<h1>${t('artist')}</h1><p class="lead">${e(B.lead)}</p><h2 class="h2">${e(B.h)}</h2>${B.ps.map(p=>`<p>${e(p)}</p>`).join('')}<p>${lk(t('alt'))}</p><a class="btn" href="${SEG[lang].c}">${t('bc')}</a>`;
-  $('#exh').textContent=B.exh;$('#exl').innerHTML=EXD.map(x=>{const K=EXK[lang],nm=x[2][0]==='@'?K[x[2].slice(1)]:x[2],ds=[x[3],x[4]&&K[x[4]]].filter(Boolean).join(' — '),f=new Intl.DateTimeFormat(LOC[lang],{day:'numeric',month:'long',year:'numeric'});let d='—';if(/^\d{4}$/.test(x[0]))d=x[0];else if(x[0]){const a=new Date(x[0]+'T12:00:00'),b=new Date(x[1]+'T12:00:00');try{d=f.formatRange(a,b)}catch(_){d=f.format(a)+' – '+f.format(b)}}return `<li><span>${e(d)}</span><div><b>${e(nm)}</b>${e(ds)}</div></li>`}).join('')}
- if($('#bar'))bar();if($('#grid')&&P!=='work')grid();
+/* Textos añadidos: colecciones, ficha técnica, profesionales, pago con Stripe */
+Object.assign(S.es,{cfuji:'Fuji · Cuatro estaciones',ask:'Preguntar por esta obra',ft:'Ficha técnica',fd:'Dimensiones',fm:'Técnica',fs:'Firma',fsv:'Firmada por el artista',fc:'Serie',fr:'Referencia',fa:'Estado',fav:'Disponible',pay:'Pagar de forma segura',payn:'Pago con tarjeta, Apple Pay o Google Pay a través de Stripe. En el siguiente paso indicarás la dirección de envío.',paying:'Conectando con el pago seguro…',cancel:'El pago se ha cancelado. Tu cesta sigue guardada.',proH:'Curadores, galerías, tasadores y coleccionistas',proP:'Pide el dossier del artista, imágenes en alta resolución, la documentación de cualquier obra o una visita al estudio en Premià de Mar (Barcelona).',proB:'Solicitar dossier',why:'Por qué comprar directamente al artista',w1:'Original único',w1p:'Pintado a mano y firmado. Sin copias ni ediciones.',w2:'Precio de estudio',w2p:'Sin comisiones de galería: el mismo precio que en el estudio.',w3:'Envío asegurado',w3p:'Embalaje profesional y envío internacional con seguimiento.',w4:'Trato directo',w4p:'Habla con el artista antes y después de la compra.',rs:'Motivo',r1:'Comprar una obra',r2:'Curaduría o exposición',r3:'Tasación o documentación',r4:'Prensa',r5:'Otro',col2:'Colecciones',sf:'Saltar al contenido'});
+Object.assign(S.ca,{cfuji:'Fuji · Quatre estacions',ask:'Preguntar per aquesta obra',ft:'Fitxa tècnica',fd:'Dimensions',fm:'Tècnica',fs:'Signatura',fsv:'Signada per l’artista',fc:'Sèrie',fr:'Referència',fa:'Estat',fav:'Disponible',pay:'Pagar de manera segura',payn:'Pagament amb targeta, Apple Pay o Google Pay a través de Stripe. Al pas següent indicaràs l’adreça d’enviament.',paying:'Connectant amb el pagament segur…',cancel:'El pagament s’ha cancel·lat. La teva cistella continua desada.',proH:'Comissaris, galeries, taxadors i col·leccionistes',proP:'Demana el dossier de l’artista, imatges en alta resolució, la documentació de qualsevol obra o una visita a l’estudi a Premià de Mar (Barcelona).',proB:'Sol·licitar dossier',why:'Per què comprar directament a l’artista',w1:'Original únic',w1p:'Pintat a mà i signat. Sense còpies ni edicions.',w2:'Preu d’estudi',w2p:'Sense comissions de galeria: el mateix preu que a l’estudi.',w3:'Enviament assegurat',w3p:'Embalatge professional i enviament internacional amb seguiment.',w4:'Tracte directe',w4p:'Parla amb l’artista abans i després de la compra.',rs:'Motiu',r1:'Comprar una obra',r2:'Comissariat o exposició',r3:'Taxació o documentació',r4:'Premsa',r5:'Altres',col2:'Col·leccions',sf:'Saltar al contingut'});
+Object.assign(S.en,{cfuji:'Fuji · Four Seasons',ask:'Ask about this work',ft:'Details',fd:'Dimensions',fm:'Medium',fs:'Signature',fsv:'Signed by the artist',fc:'Series',fr:'Reference',fa:'Status',fav:'Available',pay:'Pay securely',payn:'Pay by card, Apple Pay or Google Pay through Stripe. You will enter your shipping address in the next step.',paying:'Connecting to secure payment…',cancel:'Payment was cancelled. Your cart is still saved.',proH:'Curators, galleries, appraisers and collectors',proP:'Request the artist’s portfolio, high-resolution images, documentation for any work, or a studio visit in Premià de Mar (Barcelona).',proB:'Request portfolio',why:'Why buy direct from the artist',w1:'One-of-a-kind original',w1p:'Hand-painted and signed. No prints, no editions.',w2:'Studio price',w2p:'No gallery commission: the same price as in the studio.',w3:'Insured shipping',w3p:'Professional packing and tracked international delivery.',w4:'Direct contact',w4p:'Talk to the artist before and after your purchase.',rs:'Reason',r1:'Buy a work',r2:'Curating or exhibition',r3:'Appraisal or documentation',r4:'Press',r5:'Other',col2:'Collections',sf:'Skip to content'});
+Object.assign(S.fr,{cfuji:'Fuji · Quatre saisons',ask:'Se renseigner sur cette œuvre',ft:'Fiche technique',fd:'Dimensions',fm:'Technique',fs:'Signature',fsv:'Signée par l’artiste',fc:'Série',fr:'Référence',fa:'Statut',fav:'Disponible',pay:'Payer en toute sécurité',payn:'Paiement par carte, Apple Pay ou Google Pay via Stripe. Vous indiquerez l’adresse de livraison à l’étape suivante.',paying:'Connexion au paiement sécurisé…',cancel:'Le paiement a été annulé. Votre panier est conservé.',proH:'Commissaires, galeries, experts et collectionneurs',proP:'Demandez le dossier de l’artiste, des images en haute résolution, la documentation de toute œuvre ou une visite de l’atelier à Premià de Mar (Barcelone).',proB:'Demander le dossier',why:'Pourquoi acheter directement à l’artiste',w1:'Original unique',w1p:'Peint à la main et signé. Ni reproductions ni éditions.',w2:'Prix d’atelier',w2p:'Sans commission de galerie : le même prix qu’à l’atelier.',w3:'Livraison assurée',w3p:'Emballage professionnel et livraison internationale suivie.',w4:'Contact direct',w4p:'Échangez avec l’artiste avant et après l’achat.',rs:'Motif',r1:'Acheter une œuvre',r2:'Commissariat ou exposition',r3:'Expertise ou documentation',r4:'Presse',r5:'Autre',col2:'Collections',sf:'Aller au contenu'});
+/* Colecciones: id → nombre visible (y portada para la página de inicio) */
+const COLS=[['gallery',()=>'La vida en colors','laberint-musical'],['fuji',l=>S[l].cfuji,'fuji-primavera'],['geishas',()=>'Geishas','geisha-1']];
+const cl=(c,l)=>{const x=COLS.find(k=>k[0]===c);return x?x[1](l):c};
+/* <picture> con WebP + JPEG de respaldo */
+const pic=(id,d,alt,a='')=>`<picture><source srcset="/img/${d}/${id}.webp" type="image/webp"><img src="/img/${d}/${id}.jpg" alt="${e(alt)}"${a}></picture>`;
+Object.assign(S.es,{askm:'Hola, me interesa la obra «%s». ¿Podría darme más información?'});
+Object.assign(S.ca,{askm:'Hola, m’interessa l’obra «%s». Em podríeu donar més informació?'});
+Object.assign(S.en,{askm:'Hello, I am interested in the work “%s”. Could you send me more information?'});
+Object.assign(S.fr,{askm:'Bonjour, l’œuvre « %s » m’intéresse. Pourriez-vous m’envoyer plus d’informations ?'});
+
+/* ═══ Piezas HTML compartidas: las usan build.js (páginas estáticas) y el navegador (ficha emergente) ═══ */
+const LOCS={es:'es-ES',ca:'ca-ES',en:'en-GB',fr:'fr-FR'};
+const money=(l,n)=>new Intl.NumberFormat(LOCS[l],{style:'currency',currency:'EUR',maximumFractionDigits:0,useGrouping:'always'}).format(n);
+const dmx=w=>w.dm||`${w.w} × ${w.h} cm`;
+const altx=(l,w)=>`${w.t}${w.d[l]?' — '+w.d[l]:''} · Pere Lluís León, ${dmx(w)}`;
+const szx=w=>{const m=Math.max(w.w,w.h);return m<=80?'1':m<=120?'2':'3'};
+const SOC='<a href="https://instagram.com/perelluisleon" rel="me noopener">Instagram</a> · <a href="https://facebook.com/perelluisleon" rel="me noopener">Facebook</a>';
+const HDR=(l,P)=>`<a class="skip" href="#main">${S[l].sf}</a><header class="top"><a class="brand" href="${SEG[l].h}"><img class="logo" src="/img/logo.png" alt="" width="42" height="42"><span>Pere Lluís León</span></a><nav class="nav" aria-label="${S[l].home}">${[['home','h'],['works','w'],['artist','a'],['contact','c']].map(n=>`<a href="${SEG[l][n[1]]}"${P===n[0]||(P==='work'&&n[0]==='works')?' aria-current="page"':''}>${S[l][n[0]]}</a>`).join('')}</nav><div class="tools"><select id="lang" aria-label="Language / Idioma">${['es','ca','en','fr'].map(x=>`<option value="${x}"${x===l?' selected':''}>${x.toUpperCase()}</option>`).join('')}</select><button class="btn cb" id="cb" type="button">${S[l].cart}<span id="cn"></span></button></div></header>`;
+const FTR=l=>`<footer><div><b>Pere Lluís León</b><p>${lk(S[l].bio)}</p></div><div><b>${S[l].col2}</b><p>${COLS.map(c=>`<a href="${SEG[l].w}#${c[0]}">${e(c[1](l))}</a>`).join('<br>')}</p></div><div><b>${S[l].contact}</b><p><a href="mailto:${C.email}">${C.email}</a><br><a href="tel:+34937512087">+34 93 751 20 87</a><br>Premià de Mar, Barcelona<br>${SOC}</p></div><div><b>${S[l].proH}</b><p><a href="${SEG[l].c}?motivo=pro">${S[l].proB} →</a></p></div></footer>`;
+/* Tarjeta de obra. lazy=false para las primeras (mejor LCP) */
+const CARD=(l,w,modal=true,lazy=true)=>{const h=SEG[l].w+w.id+'/',di=modal?` data-id="${w.id}"`:'';
+ return `<article class="card${w.s?' sold':''}" data-c="${w.c}" data-z="${szx(w)}" data-s="${w.s?1:0}"><a class="im" href="${h}"${di} tabindex="-1" aria-hidden="true">${pic(w.id,'t',altx(l,w),lazy?' loading="lazy" decoding="async"':'')}${w.s?`<span class="tag">${S[l].sold}</span>`:''}</a><div class="cap"><h3><a href="${h}"${di}>${e(w.t)}</a></h3><small>${dmx(w)} · ${e(cl(w.c,l))}</small><div class="pp">${w.s?`<span class="so">${S[l].sold}</span>`:`<b>${money(l,pr(w))}</b><button class="btn sm" type="button" data-qa="${w.id}">${S[l].add2}</button>`}</div></div></article>`};
+/* Columna de información de una obra (página estática y ficha emergente) */
+const INFO=(l,w,h='h1')=>{const d=w.d[l]||'',ask=`${SEG[l].c}?obra=${w.id}`;
+ return `<p class="kick">${e(cl(w.c,l))}</p><${h} class="wt">${e(w.t)}</${h}><p class="m">${dmx(w)} · ${S[l].tech}</p>${d?`<p class="wd">${e(d)}</p>`:''}`+
+ (w.s?`<p class="pr">${S[l].sold}</p><div class="row"><a class="btn alt" href="${ask}">${S[l].ask}</a></div>`:`<p class="pr">${money(l,pr(w))}</p><div class="row"><button class="btn" type="button" data-add="${w.id}">${S[l].add}</button><button class="btn alt" type="button" data-now="${w.id}">${S[l].buy}</button></div><a class="ask" href="${ask}">${S[l].ask} →</a>`)+
+ `<ul class="ok"><li>${S[l].u1}</li><li>${S[l].u2}</li><li>${S[l].u3}</li></ul><details class="ft" open><summary>${S[l].ft}</summary><dl><dt>${S[l].fd}</dt><dd>${dmx(w)}</dd><dt>${S[l].fm}</dt><dd>${S[l].tech}</dd><dt>${S[l].fc}</dt><dd>${e(cl(w.c,l))}</dd><dt>${S[l].fs}</dt><dd>${S[l].fsv}</dd><dt>${S[l].fa}</dt><dd>${w.s?S[l].sold:S[l].fav}</dd><dt>${S[l].fr}</dt><dd>PLL-${w.id}</dd></dl></details>`};
+/* ═══ Navegador ═══ */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],e=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const lang=S[document.documentElement.dataset.l]?document.documentElement.dataset.l:'es',t=k=>S[lang][k],fmt=n=>money(lang,n);
+const W=window.WORKS,by=Object.fromEntries(W.map(w=>[w.id,w])),P=document.body.dataset.p,Q=new URLSearchParams(location.search);
+let cart=[],scaled=false,step=0,cur=null;
+try{localStorage.pll_lang=lang;cart=JSON.parse(localStorage.pll_cart2||'[]')}catch(_){}
+cart=cart.filter((i,k,a)=>by[i]&&!by[i].s&&a.indexOf(i)===k);
+const save=()=>{try{localStorage.pll_cart2=JSON.stringify(cart)}catch(_){}};
+const cname=c=>{try{return new Intl.DisplayNames([lang],{type:'region'}).of(c)}catch(_){return c}};
+const ctry=()=>['ES',...[...EU,'GB',...OT.filter(c=>c!=='GB')].sort((a,b)=>cname(a).localeCompare(cname(b),lang))].map(c=>`<option value="${c}">${e(cname(c))}</option>`).join('');
+const stripe=()=>!!C.endpoint;
+
+/* Estado de botones según la cesta */
+function sync(){
+ const n=$('#cn');if(n)n.textContent=cart.length?` (${cart.length})`:'';
+ $$('[data-qa]').forEach(b=>{const i=cart.includes(b.dataset.qa);b.disabled=i;b.textContent=t(i?'in2':'add2')});
+ $$('[data-add]').forEach(b=>{const i=cart.includes(b.dataset.add);b.disabled=i;b.textContent=t(i?'inn':'add')});
 }
-function bar(){
- const cs=[['all',t('all')],['av',t('av')],['gallery','La vida en colors'],['geishas','Geishas']];
- $('#bar').innerHTML=cs.map(c=>`<button class="chip" data-c="${c[0]}" aria-pressed="${F.c===c[0]}">${e(c[1])}</button>`).join('')+
- `<select id="zs" aria-label="${t('sz')}">${['s0','s1','s2','s3'].map((k,i)=>`<option value="${i}"${F.z==i?' selected':''}>${t(k)}</option>`).join('')}</select><span class="n" id="n"></span>`;
+
+/* Catálogo: filtros sobre las tarjetas ya pintadas en el HTML */
+const F={c:'all',z:'0'};
+function filter(){
+ const cs=$$('#grid .card');let n=0;
+ cs.forEach(c=>{const ok=(F.c==='all'||(F.c==='av'?c.dataset.s==='0':c.dataset.c===F.c))&&(F.z==='0'||c.dataset.z===F.z);c.hidden=!ok;if(ok)n++});
+ $$('.chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===F.c));
+ const x=$('#n');if(x)x.textContent=n+' '+t('w');const em=$('#empty');if(em)em.hidden=!!n;
 }
-function grid(){
- const l=list(),n=$('#n');if(n)n.textContent=l.length+' '+t('w');
- $('#grid').innerHTML=l.map(w=>{const inn=cart.includes(w.id);return `<article class="card${w.s?' sold':''}"><a class="im${w.w/w.h>1.8?' wide':''}" data-id="${w.id}" href="${SEG[lang].w}${w.id}/"><img loading="lazy" src="/img/t/${w.id}.jpg" alt="${e(alt(w))}">${w.s?`<span class="tag">${t('sold')}</span>`:''}</a><div class="cap"><b><a data-id="${w.id}" href="${SEG[lang].w}${w.id}/">${e(w.t)}</a></b><small>${dm(w)}</small><div class="pp">${w.s?`<span>${t('sold')}</span>`:`<b>${fmt(pr(w))}</b><button class="btn sm" data-qa="${w.id}"${inn?' disabled':''}>${inn?t('in2'):t('add2')}</button>`}</div></div></article>`}).join('');
- const em=$('#empty');if(em)em.hidden=!!l.length;
-}
+const visible=()=>$$('#grid .card:not([hidden])').map(c=>c.querySelector('[data-id]')).filter(Boolean).map(a=>a.dataset.id);
+
+/* Ficha emergente (catálogo e inicio): la URL pasa a ser la de la obra, para poder compartirla */
 function work(id){
- const w=by[id];if(!w)return;const l=list(),i=l.findIndex(x=>x.id===id),inn=cart.includes(id),d=desc(w);
- $('#work').innerHTML=`<button class="x" data-close aria-label="${t('cl')}">✕</button><div class="wv"><div class="pic" id="pic"><img src="/img/f/${w.id}.jpg" alt="${e(alt(w))}"></div><div class="inf"><h2>${e(w.t)}</h2><p class="m">${dm(w)} · ${t('tech')}</p>${d?`<p>${e(d)}</p>`:''}
- ${w.s?`<p class="pr">${t('sold')}</p>`:`<p class="pr">${fmt(pr(w))}</p><div class="row"><button class="btn" data-add="${id}"${inn?' disabled':''}>${inn?t('inn'):t('add')}</button><button class="btn alt" data-now="${id}">${t('buy')}</button></div>`}
- <div class="row"><button class="btn alt" id="sc">${t('sc')}</button></div>
- <ul class="ok"><li>${t('u1')}</li><li>${t('u2')}</li><li>${t('u3')}</li></ul>
- <div class="nv"><button data-go="${l[i-1]?l[i-1].id:''}"${i>0?'':' hidden'}>← ${t('pv')}</button><button data-go="${l[i+1]?l[i+1].id:''}"${i<l.length-1?'':' hidden'} style="margin-left:auto">${t('nx')} →</button></div></div></div>`;
- scaled=false;if(!$('#work').open)$('#work').showModal();$('#work').scrollTop=0;
- if(location.hash!=='#obra/'+id)history.replaceState(null,'','#obra/'+id);
+ const w=by[id];if(!w)return;cur=id;const l=visible(),i=l.indexOf(id),[iw,ih]=[w.w*10,w.h*10];
+ $('#work').innerHTML=`<button class="x" type="button" data-close aria-label="${t('cl')}">✕</button><div class="wv"><div class="pic" id="pic"><picture><source srcset="/img/f/${id}.webp" type="image/webp"><img src="/img/f/${id}.jpg" alt="${e(altx(lang,w))}" width="${iw}" height="${ih}"></picture></div><div class="inf">${INFO(lang,w,'h2')}<div class="row"><button class="btn alt" type="button" id="sc">${t('sc')}</button></div><div class="nv">${i>0?`<button type="button" data-go="${l[i-1]}">← ${t('pv')}</button>`:'<span></span>'}${i>-1&&i<l.length-1?`<button type="button" data-go="${l[i+1]}">${t('nx')} →</button>`:''}</div></div></div>`;
+ scaled=false;sync();if(!$('#work').open)$('#work').showModal();$('#work').scrollTop=0;
+ history.replaceState({w:id},'',SEG[lang].w+id+'/');
 }
 function scale(){
- const w=by[($('#work').dataset.id)||location.hash.slice(6)],p=$('#pic');scaled=!scaled;$('#sc').textContent=t(scaled?'pl':'sc');
- if(!scaled){p.innerHTML=`<img src="/img/f/${w.id}.jpg" alt="${e(alt(w))}">`;return}
+ const w=by[cur],p=$('#pic');scaled=!scaled;$('#sc').textContent=t(scaled?'pl':'sc');
+ if(!scaled){p.innerHTML=pic(w.id,'f',altx(lang,w));return}
  const SW=Math.max(300,w.w+60),H=Math.max(250,135+w.h+30),k=Math.min(p.clientWidth-32,720)/SW,ax=w.w>200?(SW-w.w)/2:130-w.w/2;
- p.innerHTML=`<div><div class="wall" style="--k:${k}px;--H:${H};--Wd:${SW}"><div class="floor"></div><div class="sofa"></div><div class="art" style="left:calc(${ax}*var(--k));width:calc(${w.w}*var(--k));height:calc(${w.h}*var(--k))"><img src="/img/f/${w.id}.jpg" alt=""></div><div class="me" style="left:calc(${SW-55}*var(--k))"></div></div><p class="wl">${t('wl')}</p></div>`;
+ p.innerHTML=`<div><div class="wall" style="--k:${k}px;--H:${H};--Wd:${SW}"><div class="floor"></div><div class="sofa"></div><div class="art" style="left:calc(${ax}*var(--k));width:calc(${w.w}*var(--k));height:calc(${w.h}*var(--k))">${pic(w.id,'f','')}</div><div class="me" style="left:calc(${SW-55}*var(--k))"></div></div><p class="wl">${t('wl')}</p></div>`;
 }
+/* En la página de una obra el botón de escala funciona igual */
+if(P==='work'){cur=document.body.dataset.w}
+
+/* Cesta y pago */
 function cartUI(){
- const c=$('#cart');$('#cb').textContent=t('cart')+(cart.length?' ('+cart.length+')':'');
- const items=cart.map(i=>by[i]);
+ const c=$('#cart'),items=cart.map(i=>by[i]),x=`<button class="x" type="button" data-close aria-label="${t('cl')}">✕</button>`;sync();
  if(step===1&&items.length){
-  c.innerHTML=`<button class="x" data-close aria-label="${t('cl')}">✕</button><h2>${t('co')}</h2><form id="f"><label>${t('nm')}<input name="n" required autocomplete="name"></label><label>${t('mail')}<input name="m" type="email" required autocomplete="email"></label><label>${t('ctry')}<select name="c" id="fc" required autocomplete="country">${ctry()}</select></label><label>${t('msg')}<textarea name="g" rows="3"></textarea></label><p class="nt" id="sum"></p><p class="nt" id="st" role="status"></p><button class="btn">${t('snd')}</button><button type="button" class="lk" data-back>${t('bk')}</button></form>`;updSum();return}
+  c.innerHTML=x+`<h2>${t('co')}</h2><form id="f"><label>${t('ctry')}<select name="c" id="fc" required autocomplete="country">${ctry()}</select></label>${stripe()?`<label>${t('mail')}<input name="m" type="email" autocomplete="email"></label>`:`<label>${t('nm')}<input name="n" required autocomplete="name"></label><label>${t('mail')}<input name="m" type="email" required autocomplete="email"></label>`}<label>${t('msg')}<textarea name="g" rows="3"></textarea></label><p class="sum" id="sum"></p>${stripe()?`<p class="nt">🔒 ${t('payn')}</p>`:''}<p class="nt" id="st" role="status" aria-live="polite"></p><button class="btn" id="pb">${t(stripe()?'pay':'snd')}</button><button type="button" class="lk" data-back>${t('bk')}</button></form>`;updSum();return}
  step=0;
- c.innerHTML=`<button class="x" data-close aria-label="${t('cl')}">✕</button><h2>${t('cart')}</h2>`+(items.length?items.map(w=>`<div class="ci"><img src="/img/t/${w.id}.jpg" alt=""><div><b>${e(w.t)}</b><br><small>${dm(w)}</small><br><button class="lk" data-rm="${w.id}">${t('rm')}</button></div><b>${fmt(pr(w))}</b></div>`).join('')+`<p class="tot"><span>${t('tot')}</span><span>${fmt(sum(items))}</span></p><p class="nt">${t('ship')}</p><br><button class="btn" data-next style="width:100%">${t('co')}</button>`:`<p class="empty" style="padding:2rem 0">${t('em')}</p>`);
+ c.innerHTML=x+`<h2>${t('cart')}</h2>`+(items.length?items.map(w=>`<div class="ci">${pic(w.id,'t','')}<div><b>${e(w.t)}</b><br><small>${dmx(w)}</small><br><button type="button" class="lk" data-rm="${w.id}">${t('rm')}</button></div><b>${fmt(pr(w))}</b></div>`).join('')+`<p class="tot"><span>${t('tot')}</span><span>${fmt(sum(items))}</span></p><p class="nt">${t('ship')}</p><button class="btn wide" type="button" data-next>${t('co')}</button>`:`<p class="empty">${t('em')}</p><a class="btn alt" href="${SEG[lang].w}">${t('go')}</a>`);
 }
+function updSum(){const s=$('#fc');if(!s)return;const n=sum(cart.map(i=>by[i])),h=ship(s.value);$('#sum').innerHTML=`<span>${fmt(n)} + ${t('shp')} ${fmt(h)}</span><b>${t('tot')} ${fmt(n+h)}</b>`}
 async function send(fd){
- const items=cart.map(i=>by[i]),cu={name:fd.get('n'),email:fd.get('m'),country:fd.get('c'),message:fd.get('g')};
- if(C.mode==='stripe'&&C.endpoint){
-  try{const r=await fetch(C.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:cart,customer:cu,lang})});const j=await r.json();if(!j.url)throw 0;location.href=j.url}catch(_){$('#st').textContent=t('err')}return}
- const body=`${cu.name} · ${cu.email} · ${cname(cu.country)}\n\n`+items.map(w=>`• ${w.t} (${dm(w)}) — ${fmt(pr(w))}`).join('\n')+`\n\n${t('shp')}: ${fmt(ship(cu.country))}\n${t('tot')}: ${fmt(sum(items)+ship(cu.country))}\n\n${cu.message||''}`;
+ const items=cart.map(i=>by[i]),cu={name:fd.get('n')||'',email:fd.get('m')||'',country:fd.get('c'),message:fd.get('g')||''};
+ if(stripe()){
+  const b=$('#pb');b.disabled=true;$('#st').textContent=t('paying');
+  try{const r=await fetch(C.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:cart,customer:cu,lang})});const j=await r.json();if(!r.ok||!j.url)throw new Error(j.error||'');location.href=j.url}
+  catch(err){b.disabled=false;$('#st').textContent=t('err')+(err.message?' ('+err.message+')':'')}return}
+ const body=`${cu.name} · ${cu.email} · ${cname(cu.country)}\n\n`+items.map(w=>`• ${w.t} (${dmx(w)}) — ${fmt(pr(w))}`).join('\n')+`\n\n${t('shp')}: ${fmt(ship(cu.country))}\n${t('tot')}: ${fmt(sum(items)+ship(cu.country))}\n\n${cu.message}`;
  location.href=`mailto:${C.email}?subject=${encodeURIComponent('Pedido — '+items.map(w=>w.t).join(', '))}&body=${encodeURIComponent(body)}`;
  $('#st').textContent=t('sent');
 }
-function add(id){if(!cart.includes(id)&&!by[id].s){cart.push(id);save()}}
-function openCart(){step=0;cartUI();if(!$('#cart').open)$('#cart').showModal()}
+function add(id){if(by[id]&&!by[id].s&&!cart.includes(id)){cart.push(id);save()}sync()}
+function openCart(s=0){step=s;cartUI();if(!$('#cart').open)$('#cart').showModal()}
+
 document.addEventListener('click',ev=>{
- const b=ev.target.closest('button,a');if(!b&&!ev.target.matches('dialog'))return;
- if(ev.target.matches('dialog')){const r=ev.target.getBoundingClientRect();if(ev.clientX<r.left||ev.clientX>r.right||ev.clientY<r.top||ev.clientY>r.bottom)ev.target.close()}
- if(!b)return;const d=b.dataset;if(d.id&&b.tagName==='A'){if(ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.button)return;ev.preventDefault()}
- if(d.qa!==undefined){add(d.qa);shell();if($('#cart').open)cartUI()}else if(d.c){F.c=d.c;bar();grid()}else if(d.id)work(d.id);
- else if(d.add!==undefined){add(d.add);$('#work').close();shell();openCart()}
- else if(d.now!==undefined){add(d.now);$('#work').close();shell();step=1;cartUI();$('#cart').showModal()}
- else if(d.dir){const g=$('#grid');g.scrollBy({left:d.dir*g.clientWidth*.8,behavior:'smooth'})}else if(d.go)work(d.go);else if(d.close!==undefined)b.closest('dialog').close();
- else if(d.rm){cart=cart.filter(i=>i!==d.rm);save();shell();cartUI()}
+ const dg=ev.target.matches('dialog')?ev.target:null;
+ if(dg){const r=dg.getBoundingClientRect();if(ev.clientX<r.left||ev.clientX>r.right||ev.clientY<r.top||ev.clientY>r.bottom)dg.close();return}
+ const b=ev.target.closest('button,a');if(!b)return;const d=b.dataset;
+ if(d.id&&b.tagName==='A'){if(ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.button)return;ev.preventDefault();work(d.id);return}
+ if(d.qa!==undefined){add(d.qa);if($('#cart').open)cartUI()}
+ else if(d.c){F.c=d.c;filter();history.replaceState(history.state,'',d.c==='all'?location.pathname:'#'+d.c)}
+ else if(d.add!==undefined){add(d.add);if($('#work').open)$('#work').close();openCart()}
+ else if(d.now!==undefined){add(d.now);if($('#work').open)$('#work').close();openCart(1)}
+ else if(d.dir){const g=$('#grid');g.scrollBy({left:d.dir*g.clientWidth*.8,behavior:'smooth'})}
+ else if(d.go)work(d.go);else if(d.close!==undefined)b.closest('dialog').close();
+ else if(d.rm){cart=cart.filter(i=>i!==d.rm);save();cartUI()}
  else if(d.next!==undefined){step=1;cartUI()}else if(d.back!==undefined){step=0;cartUI()}
- else if(b.id==='sc')scale();else if(b.id==='cb')openCart();;
+ else if(b.id==='sc')scale();else if(b.id==='cb')openCart();
 });
-document.addEventListener('change',ev=>{if(ev.target.id==='fc')updSum();if(ev.target.id==='zs'){F.z=ev.target.value;grid()}if(ev.target.id==='lang'){const nl=ev.target.value;try{localStorage.pll_lang=nl}catch(_){}if(document.documentElement.dataset.l){const a=document.querySelector('link[rel=alternate][hreflang="'+nl+'"]');location.href=a?a.href:SEG[nl].h;return}lang=nl;shell();if($('#work').open)work(location.hash.slice(6));if($('#cart').open)cartUI()}});
-document.addEventListener('submit',ev=>{if(ev.target.id==='cf'){ev.preventDefault();const f=new FormData(ev.target);location.href=`mailto:${C.email}?subject=${encodeURIComponent('Contacto — '+f.get('n'))}&body=${encodeURIComponent(f.get('g')+'\n\n'+f.get('n')+' · '+f.get('m'))}`;$('#cs').textContent=t('sent2');return}if(ev.target.id==='f'){ev.preventDefault();send(new FormData(ev.target))}});
-$('#work').addEventListener('close',()=>history.replaceState(null,'',location.pathname+location.search));
-function route(){const m=location.hash.match(/^#obra\/(.+)$/);if(m&&by[m[1]])work(m[1])}
-window.addEventListener('hashchange',route);
+document.addEventListener('change',ev=>{const g=ev.target;
+ if(g.id==='fc')updSum();
+ if(g.id==='zs'){F.z=g.value;filter()}
+ if(g.id==='lang'){try{localStorage.pll_lang=g.value}catch(_){}const a=document.querySelector('link[rel=alternate][hreflang="'+g.value+'"]');location.href=a?a.href:SEG[g.value].h}});
+document.addEventListener('submit',ev=>{const f=ev.target;
+ if(f.id==='cf'){ev.preventDefault();const d=new FormData(f);location.href=`mailto:${C.email}?subject=${encodeURIComponent((d.get('r')||t('contact'))+' — '+d.get('n'))}&body=${encodeURIComponent(d.get('g')+'\n\n'+d.get('n')+' · '+d.get('m'))}`;$('#cs').textContent=t('sent2')}
+ if(f.id==='f'){ev.preventDefault();send(new FormData(f))}});
+$('#work').addEventListener('close',()=>{cur=P==='work'?document.body.dataset.w:null;if(history.state&&history.state.w)history.replaceState(null,'',SEG[lang][P==='home'?'h':'w']+(F.c!=='all'?'#'+F.c:''))});
+
+/* Arranque por página */
+if(P==='works'){const h=location.hash.slice(1);if(COLS.some(c=>c[0]===h)||h==='av')F.c=h;filter();
+ const m=location.hash.match(/^#obra\/(.+)$/);if(m&&by[m[1]])location.replace(SEG[lang].w+m[1]+'/')}
+if(P==='home'){const v=$('#hv'),c=navigator.connection;
+ if(v&&matchMedia('(min-width:700px)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&!(c&&c.saveData)){v.innerHTML='<source src="/video/hero.mp4" type="video/mp4">';v.load();v.play().catch(()=>{});v.addEventListener('playing',()=>v.classList.add('on'),{once:true})}}
+if(P==='contact'){const w=by[Q.get('obra')],g=$('#cf [name=g]'),r=$('#cf [name=r]');
+ if(w&&g&&!g.value){g.value=t('askm').replace('%s',`${w.t} (${dmx(w)})`);if(r)r.value=t('r1')}
+ if(Q.get('motivo')==='pro'&&r)r.value=t('r2')}
 if(P==='thanks'){cart=[];save()}
-shell();route();
+/* Con Stripe activo: obras vendidas desde el último build (marcadas por el webhook) */
+if(stripe())fetch(C.endpoint.replace(/\/checkout$/,'/sold')).then(r=>r.json()).then(j=>{(j.sold||[]).forEach(i=>{if(by[i])by[i].s=true});
+ cart=cart.filter(i=>!by[i].s);save();$$('[data-qa],[data-add],[data-now]').forEach(b=>{const w=by[b.dataset.qa||b.dataset.add||b.dataset.now];if(w&&w.s)b.replaceWith(Object.assign(document.createElement('span'),{className:'so',textContent:t('sold')}))});sync()}).catch(()=>{});
+if(Q.get('pago')==='cancelado'){openCart();$('#cart h2').insertAdjacentHTML('afterend',`<p class="note">${t('cancel')}</p>`)}
+sync();

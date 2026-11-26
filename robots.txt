@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /*/gracias/
+Disallow: /*/gracies/
+Disallow: /*/thank-you/
+Disallow: /*/merci/
 
 User-agent: AhrefsBot
 Disallow: /

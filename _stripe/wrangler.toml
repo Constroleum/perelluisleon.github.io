@@ -1,0 +1,15 @@
+# Cloudflare Worker de pagos — ver LEEME.md
+name = "pll-stripe"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+SITE = "https://perelluisleon.art"
+ALLOWED_ORIGINS = "https://perelluisleon.art,https://www.perelluisleon.art"
+
+# Obras vendidas (evita vender dos veces una pieza única). Crea el espacio con:
+#   npx wrangler kv namespace create SOLD
+# y pega aquí el id que te devuelva, quitando el # de las tres líneas:
+# [[kv_namespaces]]
+# binding = "SOLD"
+# id = "PEGA_AQUI_EL_ID"
