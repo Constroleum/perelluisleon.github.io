@@ -119,13 +119,15 @@ dialog{border:0;padding:0;color:var(--ink)}dialog::backdrop{background:rgba(20,1
 .bc{padding:1rem var(--pad) 0;color:var(--mute);font-size:.92rem}.bc a{color:var(--mute)}.bc a:hover{color:var(--hi)}
 .wp{min-height:0;margin-top:1rem}.wp .pic{position:static;height:auto;min-height:60vh;max-height:88vh}.wp .pic img{max-height:80vh}
 .rel{padding-top:2.5rem}
-.wall{position:relative;flex:none;background:#E9DCD6;overflow:hidden;width:calc(var(--Wd)*var(--k));height:calc(var(--H)*var(--k))}
-.wall>*{position:absolute}
-.floor{left:0;right:0;bottom:0;height:calc(15*var(--k));background:#CDB8B0}
-.sofa{left:calc(30*var(--k));bottom:calc(15*var(--k));width:calc(200*var(--k));height:calc(85*var(--k));background:linear-gradient(#944638 0 47%,#613E38 47%);border-radius:calc(10*var(--k))}
-.art{bottom:calc(135*var(--k));box-shadow:0 6px 20px rgba(0,0,0,.3)}.art img{display:block;width:100%;height:100%;object-fit:cover;box-shadow:none;max-height:none}
-.me{bottom:calc(15*var(--k));width:calc(40*var(--k));height:calc(175*var(--k));background:#332928;border-radius:calc(20*var(--k)) calc(20*var(--k)) calc(6*var(--k)) calc(6*var(--k));opacity:.85;clip-path:polygon(35% 0,65% 0,70% 14%,100% 24%,100% 100%,0 100%,0 24%,30% 14%)}
-.wl{font-size:.85rem;color:var(--mute);margin-top:.8rem}
+/* «Ver a escala real»: obra sobre la foto de la sala */
+.room-f{width:100%;display:flex;flex-direction:column;align-items:center}
+.room{position:relative;width:100%;overflow:hidden;border-radius:6px;box-shadow:0 14px 44px rgba(0,0,0,.45);background:#B9532C}
+.rs{position:absolute;left:0;right:0}
+.rs img{display:block;width:100%;height:auto;max-height:none;box-shadow:none}
+.art{position:absolute;box-shadow:0 .35vw .9vw rgba(45,15,5,.5),0 .08vw .2vw rgba(45,15,5,.45)}
+.art img{display:block;width:100%;height:100%;object-fit:fill;max-height:none;box-shadow:none}
+.art:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,214,170,.14),rgba(255,214,170,0) 45%,rgba(30,10,0,.12));box-shadow:inset -1px -1px 0 rgba(0,0,0,.18),inset 1px 1px 0 rgba(255,235,210,.15);pointer-events:none}
+.wl{font-size:.85rem;color:var(--mute);margin-top:.8rem;text-align:center}
 
 /* Cesta */
 #cart{margin:0 0 0 auto;width:min(460px,100%);height:100%;max-height:none;background:var(--wall);padding:1.4rem;overflow-y:auto}
@@ -178,3 +180,4 @@ footer a{color:var(--ink)}footer b{display:block;color:var(--ink);margin-bottom:
  body[data-p=home] #grid{display:flex}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+.rooms{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:.8rem}
