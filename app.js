@@ -2,7 +2,7 @@
    endpoint vacío  → el pedido se envía por correo (mailto).
    endpoint con la URL del Worker de Stripe (ver _stripe/LEEME.md) → pago con tarjeta en Stripe Checkout.
    El Worker vuelve a calcular precios y envío por su cuenta: nunca se fía de lo que mande el navegador. */
-const C={price:3000,email:'ilust.medical@gmail.com',endpoint:''};
+const C={price:3000,email:'ilust.medical@gmail.com',endpoint:'https://pll-stripe.constroleum.workers.dev/checkout'};
 /* Precio por defecto C.price; excepciones por id de obra (el Worker usa los mismos precios) */
 const PR={'fuji-primavera':1400,'fuji-estiu':1400,'fuji-tardor':1400,'fuji-hivern':1400,'gat-a-la-finestra':1400,'laberint-musical':4500,'1-o-17':4500,'parella-en-blaus':2500,'reflexos':2500,'llagrimes-de-sang':2500,'dona-nua':2500},pr=w=>PR[w.id]||C.price,sum=a=>a.reduce((s,w)=>s+pr(w),0);
 const S={
