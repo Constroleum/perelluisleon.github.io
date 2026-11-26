@@ -107,17 +107,35 @@ function work(id){
  scaled=false;sync();if(!$('#work').open)$('#work').showModal();$('#work').scrollTop=0;
  history.replaceState({w:id},'',SEG[lang].w+id+'/');
 }
-/* «Ver a escala real»: la obra sobre una pared de salón (img/sala.*, 1672×1281 px).
-   Medidas de la foto: sofá de 220 cm = 935 px (4,25 px/cm en el frente del sofá; ≈4,0 px/cm en el plano de la pared,
-   que está más lejos de la cámara); respaldo en y=852; centro del sofá x=877; la planta ocupa hasta x≈330.
-   La obra se cuelga con el borde inferior a 25 cm sobre el respaldo, como recomiendan los interioristas. */
-const ROOM={W:1672,H:1281,back:852,gap:25,cx:877,ppc:4.0,left:330,top0:340};
+/* ═══ «Ver a escala real»: la obra sobre fotos de ambientes ═══
+   Para añadir un ambiente: guarda img/sala-<id>.webp (ancho completo), img/sala-<id>-900.webp e img/sala-<id>.jpg
+   y añade una entrada aquí (todas las medidas en píxeles de la imagen completa):
+     W,H   tamaño de la imagen          back  y del borde superior del mueble de referencia (respaldo, aparador…)
+     gap   cm entre el mueble y el cuadro  cx   x del centro del mueble
+     ppc   píxeles por cm EN EL PLANO DE LA PARED   left/right  límites libres (plantas, columnas…)
+     top0  y a partir de la que se muestra la foto si la obra es pequeña (la parte superior es pared añadida) */
+const ROOMS=[
+ /* Terracota: sofá de 220 cm = 935 px en su frente (4,25 px/cm) → ≈4,0 px/cm en la pared; apliques retirados y pared prolongada */
+ {id:'terracota',W:1672,H:1281,back:852,gap:25,cx:877,ppc:4.0,left:330,right:1632,top0:340,
+  name:{es:'Salón terracota',ca:'Saló terracota',en:'Terracotta living room',fr:'Salon terracotta'},
+  ref:{es:'un sofá de 2,20 m',ca:'un sofà de 2,20 m',en:'a 2.20 m sofa',fr:'un canapé de 2,20 m'}}
+];
+Object.assign(S.es,{wl:'La obra se muestra a tamaño real, colgada a %g cm sobre %r.',rm2:'Ambiente'});
+Object.assign(S.ca,{wl:'L’obra es mostra a mida real, penjada a %g cm sobre %r.',rm2:'Ambient'});
+Object.assign(S.en,{wl:'The painting is shown at real size, hung %g cm above %r.',rm2:'Room'});
+Object.assign(S.fr,{wl:'L’œuvre est montrée en taille réelle, accrochée à %g cm au-dessus de %r.',rm2:'Ambiance'});
+let room=ROOMS[0].id;try{if(ROOMS.some(r=>r.id===localStorage.pll_room))room=localStorage.pll_room}catch(_){}
 function scale(){
  const w=by[cur],p=$('#pic');scaled=!scaled;$('#sc').textContent=t(scaled?'pl':'sc');
  if(!scaled){p.innerHTML=pic(w.id,'f',altx(lang,w));return}
- const R=ROOM,wp=w.w*R.ppc,hp=w.h*R.ppc,bot=R.back-R.gap*R.ppc,top=bot-hp;
- const cx=Math.min(Math.max(R.cx,R.left+wp/2),R.W-40-wp/2),crop=Math.max(0,Math.min(R.top0,top-90)),vh=R.H-crop,pc=(v,d)=>(v/d*100).toFixed(3)+'%';
- p.innerHTML=`<figure class="room-f"><div class="room" style="aspect-ratio:${R.W}/${vh};max-width:calc(78vh*${(R.W/vh).toFixed(4)})"><div class="rs" style="top:-${pc(crop,vh)}"><picture><source type="image/webp" srcset="/img/sala-900.webp 900w,/img/sala.webp 1672w" sizes="(max-width:860px) 100vw,60vw"><img src="/img/sala.jpg" alt="" width="${R.W}" height="${R.H}"></picture><div class="art" style="left:${pc(cx-wp/2,R.W)};top:${pc(top,R.H)};width:${pc(wp,R.W)};height:${pc(hp,R.H)}">${pic(w.id,'f','')}</div></div></div><figcaption class="wl">${t('wl')} · ${dmx(w)}</figcaption></figure>`;
+ drawRoom();
+}
+function drawRoom(){
+ const w=by[cur],p=$('#pic'),R=ROOMS.find(r=>r.id===room)||ROOMS[0],src='/img/sala-'+R.id;
+ const wp=w.w*R.ppc,hp=w.h*R.ppc,bot=R.back-R.gap*R.ppc,top=bot-hp;
+ const cx=Math.min(Math.max(R.cx,R.left+wp/2),R.right-wp/2),crop=Math.max(0,Math.min(R.top0,top-90)),vh=R.H-crop,pc=(v,d)=>(v/d*100).toFixed(3)+'%';
+ const sel=ROOMS.length>1?`<div class="rooms" role="group" aria-label="${t('rm2')}">${ROOMS.map(r=>`<button type="button" class="chip" data-room="${r.id}" aria-pressed="${r.id===R.id}">${e(r.name[lang])}</button>`).join('')}</div>`:'';
+ p.innerHTML=`<figure class="room-f"><div class="room" style="aspect-ratio:${R.W}/${vh};max-width:calc(74vh*${(R.W/vh).toFixed(4)})"><div class="rs" style="top:-${pc(crop,vh)}"><picture><source type="image/webp" srcset="${src}-900.webp 900w,${src}.webp ${R.W}w" sizes="(max-width:860px) 100vw,60vw"><img src="${src}.jpg" alt="" width="${R.W}" height="${R.H}"></picture><div class="art" style="left:${pc(cx-wp/2,R.W)};top:${pc(top,R.H)};width:${pc(wp,R.W)};height:${pc(hp,R.H)}">${pic(w.id,'f','')}</div></div></div><figcaption class="wl">${t('wl').replace('%g',R.gap).replace('%r',R.ref[lang])} · ${dmx(w)}</figcaption>${sel}</figure>`;
 }
 /* En la página de una obra el botón de escala funciona igual */
 if(P==='work'){cur=document.body.dataset.w}
@@ -157,6 +175,7 @@ document.addEventListener('click',ev=>{
  else if(d.go)work(d.go);else if(d.close!==undefined)b.closest('dialog').close();
  else if(d.rm){cart=cart.filter(i=>i!==d.rm);save();cartUI()}
  else if(d.next!==undefined){step=1;cartUI()}else if(d.back!==undefined){step=0;cartUI()}
+ else if(d.room){room=d.room;try{localStorage.pll_room=room}catch(_){}drawRoom()}
  else if(b.id==='sc')scale();else if(b.id==='cb')openCart();
 });
 document.addEventListener('change',ev=>{const g=ev.target;

@@ -180,3 +180,4 @@ footer a{color:var(--ink)}footer b{display:block;color:var(--ink);margin-bottom:
  body[data-p=home] #grid{display:flex}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+.rooms{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:.8rem}
