@@ -78,11 +78,14 @@ async function checkout(req,env){
  p.set('payment_intent_data[description]','Pere Lluís León — '+items.map(x=>x[1].t).join(', '));
  p.set('success_url',env.SITE+cat.thanks[lang]+'?session_id={CHECKOUT_SESSION_ID}');
  p.set('cancel_url',`${env.SITE}/${lang}/?pago=cancelado`);
- p.set('expires_at',String(Math.floor(Date.now()/1000)+30*60)); // la sesión caduca en 30 min (mínimo de Stripe)
+ p.set('expires_at',String(Math.floor(Date.now()/1000)+40*60)); // la sesión caduca en 40 min (Stripe exige un mínimo de 30)
 
  const r=await fetch('https://api.stripe.com/v1/checkout/sessions',{method:'POST',headers:{Authorization:'Bearer '+env.STRIPE_SECRET_KEY,'Content-Type':'application/x-www-form-urlencoded'},body:p});
  const s=await r.json();
- if(!r.ok){console.error('stripe',s.error&&s.error.message);return [{error:'stripe'},502]}
+ if(!r.ok){const er=s.error||{};console.error('stripe',er.type,er.code,er.param,er.message);
+  /* Solo el tipo y el código del error (nunca datos de la cuenta), para diagnosticar desde la web */
+  const why=er.type==='authentication_error'?'clave de Stripe no válida':[er.code,er.param].filter(Boolean).join(' ')||er.type||'';
+  return [{error:'stripe'+(why?': '+why:'')},502]}
  return [{url:s.url},200];
 }
 
