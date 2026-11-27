@@ -77,9 +77,57 @@ Después ejecuta `node build.js` (así la FAQ explica el pago con tarjeta) y pub
 3. Borra la marca de vendida de la prueba: Cloudflare → Workers → KV → SOLD → elimina la clave de esa obra.
 4. Para cobrar de verdad: `npx wrangler secret put STRIPE_SECRET_KEY` con la clave `sk_live_…` y crea el webhook también en **modo real** (con su propio `whsec_…`).
 
+## 6. Emails de confirmación
+
+Cuando un pago se completa, el Worker envía dos correos:
+
+- **Al comprador**, en su idioma (es/ca/en/fr): las obras compradas con su imagen, el envío, el total pagado y la dirección de envío, con la explicación de que el artista le escribirá para coordinar el envío. Si responde, la respuesta llega a `MAIL_ADMIN`.
+- **A `MAIL_ADMIN`** (ilust.medical@gmail.com): aviso de venta con las obras, el nombre, el email, el teléfono, la dirección, el mensaje del cliente y el enlace al pago en Stripe.
+
+Se envían con **Resend** (plan gratuito: 3.000 correos al mes):
+
+1. Crea una cuenta en <https://resend.com>.
+2. **Domains → Add domain** → `perelluisleon.art`, y añade en el DNS del dominio los registros que te indique (SPF y DKIM). Sin esto los correos irían a spam o no saldrían.
+3. **API Keys → Create API key** (permiso «Sending access») y guárdala en el Worker:
+
+```bash
+npx wrangler secret put RESEND_API_KEY
+```
+
+4. Revisa `MAIL_FROM` y `MAIL_ADMIN` en `wrangler.toml` y vuelve a publicar con `npx wrangler deploy`.
+
+Para probar, haz una compra con la tarjeta `4242 4242 4242 4242` en modo de prueba usando tu propio email. Si falta `RESEND_API_KEY`, no se envía ningún correo y el resto funciona igual. Con el KV `SOLD` activo, cada pedido se envía una sola vez aunque Stripe repita el aviso.
+
+Además, puedes activar en Stripe (**Configuración → Correos electrónicos de clientes → Pagos correctos**) el recibo oficial de Stripe, que se enviará además de esta confirmación.
+
+## 7. Panel de gestión (precios y obras vendidas)
+
+Un panel privado, con usuario y contraseña, para:
+
+- **Cambiar el precio** de cualquier obra. Se aplica al instante en el pago y en la web, sin regenerar nada. «Volver al precio base» recupera el precio de `app.js`.
+- **Marcar una obra como vendida** (por ejemplo, si la vendes en una exposición) o **volver a ponerla a la venta**.
+- Ver qué obras **se han vendido por la web**: Stripe las marca solas, con la fecha y el email del comprador.
+
+Necesita el KV `SOLD` (paso 2). Para activarlo:
+
+```bash
+npx wrangler secret put ADMIN_USER
+npx wrangler secret put ADMIN_PASS
+npx wrangler deploy
+```
+
+Elige una contraseña larga (12 caracteres o más). Tras 10 intentos fallidos, esa conexión queda bloqueada 15 minutos.
+
+El panel queda en `https://pll-stripe.TU-SUBDOMINIO.workers.dev/admin`. Para usar **admin.perelluisleon.art**:
+
+1. El DNS del dominio tiene que estar en Cloudflare (plan gratuito): **Add a site → perelluisleon.art**, y cambia los servidores DNS en tu registrador por los que te indique Cloudflare. Copia antes los registros actuales de GitHub Pages (Cloudflare suele importarlos solo). La web sigue alojada en GitHub Pages.
+2. En `wrangler.toml`, quita los `#` de las tres líneas `[[routes]]` y ejecuta `npx wrangler deploy`. Cloudflare crea el subdominio y su certificado automáticamente.
+
+**Cómo se ve en la web:** las páginas llevan el precio del último `node build.js`. Al cargar, la web consulta el panel y actualiza los precios y las obras vendidas en pantalla, y el pago cobra siempre el precio del panel. Google ve el precio de la página generada, así que de vez en cuando conviene pasar los cambios a `app.js` y `data.js` y regenerar.
+
 ## Después de cada venta
 
-Stripe te envía un correo con el pedido, la dirección de envío y el teléfono del cliente. Para que la obra salga como vendida de forma permanente (también en Google):
+Recibirás el aviso de venta (paso 6) y Stripe también te envía un correo con el pedido. Para que la obra salga como vendida de forma permanente (también en Google):
 
 1. En `data.js`, pon `"s":true` en esa obra.
 2. Ejecuta `node build.js` y publica.

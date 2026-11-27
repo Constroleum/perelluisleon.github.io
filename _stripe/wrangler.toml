@@ -6,8 +6,17 @@ compatibility_date = "2026-11-01"
 [vars]
 SITE = "https://perelluisleon.art"
 ALLOWED_ORIGINS = "https://perelluisleon.art,https://www.perelluisleon.art"
+# Emails de confirmación (ver LEEME.md, paso 6). El remitente debe ser de un dominio verificado en Resend.
+MAIL_FROM = "Pere Lluís León <pedidos@perelluisleon.art>"
+MAIL_ADMIN = "ilust.medical@gmail.com"
 
-# Obras vendidas (evita vender dos veces una pieza única). Crea el espacio con:
+# Panel de gestión en admin.perelluisleon.art (ver LEEME.md, paso 7).
+# Requiere que el DNS de perelluisleon.art esté en Cloudflare. Quita los # de las tres líneas:
+# [[routes]]
+# pattern = "admin.perelluisleon.art"
+# custom_domain = true
+
+# Obras vendidas y precios del panel (evita vender dos veces una pieza única). Crea el espacio con:
 #   npx wrangler kv namespace create SOLD
 # y pega aquí el id que te devuelva, quitando el # de las tres líneas:
 # [[kv_namespaces]]
