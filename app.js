@@ -54,30 +54,11 @@ Object.assign(S.ca,{askm:'Hola, m’interessa l’obra «%s». Em podríeu donar
 Object.assign(S.en,{askm:'Hello, I am interested in the work “%s”. Could you send me more information?'});
 Object.assign(S.fr,{askm:'Bonjour, l’œuvre « %s » m’intéresse. Pourriez-vous m’envoyer plus d’informations ?'});
 
-/* ═══ Ilustración médica ═══ imágenes en img/med/<id>.jpg (máx. 1600 px) e img/med/<id>-t.jpg (720 px)
-   MEDW: [id, categoría, ancho, alto, {títulos}] — en el orden en que se muestran */
+/* ═══ Ilustración médica ═══ textos y datos de la sección en med.js (solo lo usa build.js) */
 Object.assign(S.es,{r6:'Encargo de ilustración médica',zm:'Ampliar'});
 Object.assign(S.ca,{r6:'Encàrrec d’il·lustració mèdica',zm:'Ampliar'});
 Object.assign(S.en,{r6:'Medical illustration commission',zm:'Enlarge'});
 Object.assign(S.fr,{r6:'Commande d’illustration médicale',zm:'Agrandir'});
-const MEDC={anat:{es:'Anatomía y cirugía',ca:'Anatomia i cirurgia',en:'Anatomy & surgery',fr:'Anatomie et chirurgie'},res:{es:'Investigación científica',ca:'Recerca científica',en:'Scientific research',fr:'Recherche scientifique'},nat:{es:'Ciencias naturales',ca:'Ciències naturals',en:'Natural sciences',fr:'Sciences naturelles'},vet:{es:'Veterinaria',ca:'Veterinària',en:'Veterinary',fr:'Vétérinaire'},des:{es:'Diseño gráfico',ca:'Disseny gràfic',en:'Graphic design',fr:'Design graphique'},tec:{es:'Tecnología',ca:'Tecnologia',en:'Technology',fr:'Technologie'}};
-const MEDW=[
- ['cabeza-cuello','anat',945,1153,{es:'Cabeza y cuello, corte sagital',ca:'Cap i coll, tall sagital',en:'Head and neck, sagittal section',fr:'Tête et cou, coupe sagittale'}],
- ['neuronas','res',1600,969,{es:'Neuronas y células gliales',ca:'Neurones i cèl·lules glials',en:'Neurons and glial cells',fr:'Neurones et cellules gliales'}],
- ['cirugia-pancreas','anat',1131,1600,{es:'Técnica quirúrgica de páncreas',ca:'Tècnica quirúrgica de pàncrees',en:'Pancreatic surgical technique',fr:'Technique chirurgicale du pancréas'}],
- ['perro','vet',945,649,{es:'Anatomía del perro',ca:'Anatomia del gos',en:'Canine anatomy',fr:'Anatomie du chien'}],
- ['celula','res',1427,1581,{es:'La célula eucariota',ca:'La cèl·lula eucariota',en:'The eukaryotic cell',fr:'La cellule eucaryote'}],
- ['escarabajo','nat',800,601,{es:'Escarabajo Hércules',ca:'Escarabat Hèrcules',en:'Hercules beetle',fr:'Scarabée Hercule'}],
- ['cuerpo-humano','anat',940,410,{es:'Sistemas del cuerpo humano',ca:'Sistemes del cos humà',en:'Systems of the human body',fr:'Systèmes du corps humain'}],
- ['manzana','des',1265,1600,{es:'Manzana y estructura geométrica',ca:'Poma i estructura geomètrica',en:'Apple and geometric structure',fr:'Pomme et structure géométrique'}],
- ['capsula','tec',967,1243,{es:'Cápsula espacial y la Tierra',ca:'Càpsula espacial i la Terra',en:'Space capsule and Earth',fr:'Capsule spatiale et la Terre'}]];
-const MEDPUB=['Editora Médica Panamericana','McGraw-Hill Interamericana','Espax Médica','WebSurg','Journal of Vascular Surgery','Annals of Surgery','World Journal of Surgery','Éditions Bréal','Fransel Éditions','Science & Vie','Pour la Science'];
-const MEDHOS=['Hospital Clínic de Barcelona','Hospital Universitari Vall d’Hebron','Hospital de l’Esperança','Hospital Universitario 12 de Octubre','Universitat Autònoma de Barcelona','Facultat de Medicina · Universitat de Barcelona','Campus de Bellvitge · Universitat de Barcelona','Hôpital Lapeyronie · Montpellier'];
-const MEDT={
-es:{title:'Ilustración médica y científica | Pere Lluís León, ilustrador médico en Barcelona',d:'Ilustración médica, quirúrgica y científica de Pere Lluís León para hospitales, facultades de medicina, libros y revistas especializadas, presentaciones y animaciones 2D.',kick:'Ilustrador médico',lead:'Ilustraciones médicas para hospitales, facultades de medicina, libros y revistas especializadas, presentaciones y animaciones 2D.',ps:['Comunicador visual experto en biomedicina, ciencias naturales y técnica. Cada ilustración une el oficio del dibujo con un conocimiento científico y médico exacto.','Formado en dibujo y pintura en la Llotja y la Escola Massana, estudió ilustración médica en colaboración con el Departamento de Anatomía de la Facultad de Medicina de Barcelona. Desde entonces ha realizado libros de anatomía, cirugía y microbiología, y proyectos de comunicación visual con hospitales y facultades de España y Europa.'],gal:'Selección de trabajos',pub:'Editoriales y revistas',hos:'Hospitales y universidades',ctaH:'Encargar una ilustración',ctaP:'Ilustración médica, quirúrgica o científica para publicaciones, docencia, congresos o divulgación. Cuéntanos tu proyecto.',ctaB:'Escribir al ilustrador',more:'Animaciones 2D y portfolio completo'},
-ca:{title:'Il·lustració mèdica i científica | Pere Lluís León, il·lustrador mèdic a Barcelona',d:'Il·lustració mèdica, quirúrgica i científica de Pere Lluís León per a hospitals, facultats de medicina, llibres i revistes especialitzades, presentacions i animacions 2D.',kick:'Il·lustrador mèdic',lead:'Il·lustracions mèdiques per a hospitals, facultats de medicina, llibres i revistes especialitzades, presentacions i animacions 2D.',ps:['Comunicador visual expert en biomedicina, ciències naturals i tècnica. Cada il·lustració uneix l’ofici del dibuix amb un coneixement científic i mèdic exacte.','Format en dibuix i pintura a la Llotja i l’Escola Massana, va estudiar il·lustració mèdica en col·laboració amb el Departament d’Anatomia de la Facultat de Medicina de Barcelona. Des d’aleshores ha fet llibres d’anatomia, cirurgia i microbiologia, i projectes de comunicació visual amb hospitals i facultats d’Espanya i d’Europa.'],gal:'Selecció de treballs',pub:'Editorials i revistes',hos:'Hospitals i universitats',ctaH:'Encarregar una il·lustració',ctaP:'Il·lustració mèdica, quirúrgica o científica per a publicacions, docència, congressos o divulgació. Explica’ns el teu projecte.',ctaB:'Escriure a l’il·lustrador',more:'Animacions 2D i portfolio complet'},
-en:{title:'Medical & Scientific Illustration | Pere Lluís León, Medical Illustrator in Barcelona',d:'Medical, surgical and scientific illustration by Pere Lluís León for hospitals, medical schools, medical books and specialist journals, presentations and 2D animation.',kick:'Medical illustrator',lead:'Medical illustrations for hospitals, medical schools, medical books and specialist journals, presentations and 2D animation.',ps:['A visual communicator specialising in biomedicine, natural sciences and technology. Each illustration combines the craft of drawing with exact scientific and medical knowledge.','Trained in drawing and painting at Llotja and the Escola Massana, he studied medical illustration in collaboration with the Department of Anatomy of the Faculty of Medicine in Barcelona. Since then he has produced anatomy, surgery and microbiology books, and visual communication projects with hospitals and faculties across Spain and Europe.'],gal:'Selected work',pub:'Publishers and journals',hos:'Hospitals and universities',ctaH:'Commission an illustration',ctaP:'Medical, surgical or scientific illustration for publications, teaching, conferences or public outreach. Tell us about your project.',ctaB:'Write to the illustrator',more:'2D animations and full portfolio'},
-fr:{title:'Illustration médicale et scientifique | Pere Lluís León, illustrateur médical à Barcelone',d:'Illustration médicale, chirurgicale et scientifique de Pere Lluís León pour hôpitaux, facultés de médecine, livres et revues spécialisées, présentations et animations 2D.',kick:'Illustrateur médical',lead:'Illustrations médicales pour hôpitaux, facultés de médecine, livres et revues spécialisées, présentations et animations 2D.',ps:['Communicant visuel spécialisé en biomédecine, sciences naturelles et technique. Chaque illustration allie le métier du dessin à une connaissance scientifique et médicale exacte.','Formé au dessin et à la peinture à la Llotja et à l’Escola Massana, il a étudié l’illustration médicale en collaboration avec le département d’anatomie de la Faculté de médecine de Barcelone. Il a depuis réalisé des livres d’anatomie, de chirurgie et de microbiologie, ainsi que des projets de communication visuelle avec des hôpitaux et des facultés d’Espagne et d’Europe.'],gal:'Sélection de travaux',pub:'Éditeurs et revues',hos:'Hôpitaux et universités',ctaH:'Commander une illustration',ctaP:'Illustration médicale, chirurgicale ou scientifique pour publications, enseignement, congrès ou vulgarisation. Parlez-nous de votre projet.',ctaB:'Écrire à l’illustrateur',more:'Animations 2D et portfolio complet'}};
 
 /* ═══ Piezas HTML compartidas: las usan build.js (páginas estáticas) y el navegador (ficha emergente) ═══ */
 const LOCS={es:'es-ES',ca:'ca-ES',en:'en-GB',fr:'fr-FR'};
@@ -191,8 +172,8 @@ document.addEventListener('click',ev=>{
  const dg=ev.target.matches('dialog')?ev.target:null;
  if(dg){const r=dg.getBoundingClientRect();if(ev.clientX<r.left||ev.clientX>r.right||ev.clientY<r.top||ev.clientY>r.bottom)dg.close();return}
  const b=ev.target.closest('button,a');if(!b)return;const d=b.dataset;
- if(d.med!==undefined){if(ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.button)return;ev.preventDefault();const wk=$('#work');
-  wk.innerHTML=`<button class="x" type="button" data-close aria-label="${t('cl')}">✕</button><figure class="mz"><img src="${e(b.getAttribute('href'))}" alt="${e(d.t)}"><figcaption>${e(d.t)}</figcaption></figure>`;if(!wk.open)wk.showModal();return}
+ if(d.med!==undefined){if(ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.button)return;ev.preventDefault();lb($$('[data-med]').indexOf(b));return}
+ if(d.lb){lb(+d.lb);return}
  if(d.id&&b.tagName==='A'){if(ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.button)return;ev.preventDefault();work(d.id);return}
  if(d.qa!==undefined){add(d.qa);if($('#cart').open)cartUI()}
  else if(d.c){F.c=d.c;filter();history.replaceState(history.state,'',d.c==='all'?location.pathname:'#'+d.c)}
@@ -213,6 +194,19 @@ document.addEventListener('submit',ev=>{const f=ev.target;
  if(f.id==='cf'){ev.preventDefault();const d=new FormData(f);location.href=`mailto:${C.email}?subject=${encodeURIComponent((d.get('r')||t('contact'))+' — '+d.get('n'))}&body=${encodeURIComponent(d.get('g')+'\n\n'+d.get('n')+' · '+d.get('m'))}`;$('#cs').textContent=t('sent2')}
  if(f.id==='f'){ev.preventDefault();send(new FormData(f))}});
 $('#work').addEventListener('close',()=>{cur=P==='work'?document.body.dataset.w:null;if(history.state&&history.state.w)history.replaceState(null,'',SEG[lang][P==='home'?'h':'w']+(F.c!=='all'?'#'+F.c:''))});
+
+/* Ilustración médica: visor con anterior/siguiente (imágenes y vídeos marcados con data-med) */
+let lbi=-1;
+function lb(i){
+ const L=$$('[data-med]'),a=L[i],wk=$('#work');if(!a)return;lbi=i;
+ const v=a.dataset.v,cap=a.dataset.t||'',n=`${i+1} / ${L.length}`,src=e(a.getAttribute('href'));
+ wk.innerHTML=`<button class="x" type="button" data-close aria-label="${t('cl')}">✕</button><figure class="mz">${v?`<video src="${src}" poster="${e(v)}" controls autoplay playsinline loop></video>`:`<img src="${src}" alt="${e(cap)}">`}<figcaption>${cap?`<span>${e(cap)}</span>`:''}<small>${n}</small></figcaption>${i>0?`<button class="mzn" type="button" data-lb="${i-1}" aria-label="${t('pv')}">←</button>`:''}${i<L.length-1?`<button class="mzn nx" type="button" data-lb="${i+1}" aria-label="${t('nx')}">→</button>`:''}</figure>`;
+ if(!wk.open)wk.showModal();
+}
+document.addEventListener('keydown',ev=>{if(lbi<0||!$('#work').open||!$('#work .mz'))return;if(ev.key==='ArrowRight')lb(lbi+1);if(ev.key==='ArrowLeft')lb(lbi-1)});
+$('#work').addEventListener('close',()=>{lbi=-1;const v=$('#work video');if(v)v.pause()});
+/* Pase de imágenes de la cabecera */
+{const s=$$('.mss img');if(s.length>1&&!matchMedia('(prefers-reduced-motion: reduce)').matches){let k=0;setInterval(()=>{s[k].classList.remove('on');k=(k+1)%s.length;s[k].classList.add('on')},5000)}}
 
 /* Arranque por página */
 if(P==='works'){const h=location.hash.slice(1);if(COLS.some(c=>c[0]===h)||h==='av')F.c=h;filter();

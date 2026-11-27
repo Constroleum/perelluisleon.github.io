@@ -5,8 +5,8 @@ const fs=require('fs'),path=require('path');
 const SITE='https://perelluisleon.art',TODAY=new Date().toISOString().slice(0,10);
 const src=fs.readFileSync('app.js','utf8');
 const D=new Function("const e=s=>String(s).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));"+
- src.slice(src.indexOf('const C='),src.indexOf('const $=s=>'))+';return {C,PR,pr,S,BIO,STMT,EXK,EXD,MED,lk,SEG,COLS,cl,pic,money,HDR,FTR,CARD,INFO,EU,OT,ship,altx,dmx,SOC,MEDC,MEDW,MEDPUB,MEDHOS,MEDT}')();
-const {C,PR,pr,S,BIO,STMT,EXK,EXD,MED,lk,SEG,COLS,cl,pic,money,HDR,FTR,CARD,INFO,EU,OT,ship,altx,dmx,SOC,MEDC,MEDW,MEDPUB,MEDHOS,MEDT}=D;
+ src.slice(src.indexOf('const C='),src.indexOf('const $=s=>'))+';return {C,PR,pr,S,BIO,STMT,EXK,EXD,MED,lk,SEG,COLS,cl,pic,money,HDR,FTR,CARD,INFO,EU,OT,ship,altx,dmx,SOC}')();
+const {C,PR,pr,S,BIO,STMT,EXK,EXD,MED,lk,SEG,COLS,cl,pic,money,HDR,FTR,CARD,INFO,EU,OT,ship,altx,dmx,SOC}=D;
 const W=new Function('window',fs.readFileSync('data.js','utf8')+';return window.WORKS')({});
 const DIM=JSON.parse(fs.readFileSync('img/dims.json','utf8'));
 for(const w of W)for(const d of ['f','t'])for(const x of ['jpg','webp'])if(!fs.existsSync(`img/${d}/${w.id}.${x}`))console.warn(`⚠ falta img/${d}/${w.id}.${x}`);
@@ -76,9 +76,9 @@ const crumbs=(l,items)=>({"@context":"https://schema.org","@type":"BreadcrumbLis
 const SHIP=[[30,['ES']],[200,[...EU,'GB']],[400,OT.filter(c=>c!=='GB')]].map(([v,cs])=>({"@type":"OfferShippingDetails","shippingRate":{"@type":"MonetaryAmount","value":v,"currency":"EUR"},"shippingDestination":cs.map(c=>({"@type":"DefinedRegion","addressCountry":c}))}));
 
 /* ── Piezas HTML ── */
-function head(l,{title,d,k,id,img,og='website',schema=[],noindex,pre=''}){
- const u=id?url(l,k,id):url(l,k);
- return `<!doctype html><html lang="${l}" data-l="${l}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(title)}</title><meta name="description" content="${e(trunc(d))}">${noindex?'<meta name="robots" content="noindex">':'<meta name="robots" content="index,follow,max-image-preview:large">'}<meta name="author" content="Pere Lluís León"><meta name="theme-color" content="#1B1B1C"><link rel="canonical" href="${u}">${noindex?'':alts(k,id)}<meta property="og:type" content="${og}"><meta property="og:site_name" content="Pere Lluís León"><meta property="og:title" content="${e(title)}"><meta property="og:description" content="${e(trunc(d))}"><meta property="og:url" content="${u}"><meta property="og:image" content="${SITE}${img}"><meta property="og:image:alt" content="${e(title)}"><meta property="og:locale" content="${OGL[l]}">${LANGS.filter(x=>x!==l).map(x=>`<meta property="og:locale:alternate" content="${OGL[x]}">`).join('')}<meta name="twitter:card" content="summary_large_image"><link rel="icon" href="/img/logo.png"><link rel="apple-touch-icon" href="/img/logo.png"><link rel="preload" href="/fonts/hanken.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/bricolage.woff2" as="font" type="font/woff2" crossorigin>${pre}<link rel="stylesheet" href="/style.css">${schema.map(ld).join('')}</head>`;
+function head(l,{title,d,k,id,img,og='website',schema=[],noindex,pre='',paths}){
+ const u=paths?SITE+paths[l]:id?url(l,k,id):url(l,k);
+ return `<!doctype html><html lang="${l}" data-l="${l}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(title)}</title><meta name="description" content="${e(trunc(d))}">${noindex?'<meta name="robots" content="noindex">':'<meta name="robots" content="index,follow,max-image-preview:large">'}<meta name="author" content="Pere Lluís León"><meta name="theme-color" content="#1B1B1C"><link rel="canonical" href="${u}">${noindex?'':paths?LANGS.map(x=>`<link rel="alternate" hreflang="${x}" href="${SITE+paths[x]}">`).join('')+`<link rel="alternate" hreflang="x-default" href="${SITE+paths.en}">`:alts(k,id)}<meta property="og:type" content="${og}"><meta property="og:site_name" content="Pere Lluís León"><meta property="og:title" content="${e(title)}"><meta property="og:description" content="${e(trunc(d))}"><meta property="og:url" content="${u}"><meta property="og:image" content="${SITE}${img}"><meta property="og:image:alt" content="${e(title)}"><meta property="og:locale" content="${OGL[l]}">${LANGS.filter(x=>x!==l).map(x=>`<meta property="og:locale:alternate" content="${OGL[x]}">`).join('')}<meta name="twitter:card" content="summary_large_image"><link rel="icon" href="/img/logo.png"><link rel="apple-touch-icon" href="/img/logo.png"><link rel="preload" href="/fonts/hanken.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/bricolage.woff2" as="font" type="font/woff2" crossorigin>${pre}<link rel="stylesheet" href="/style.css">${schema.map(ld).join('')}</head>`;
 }
 const tail=l=>`<dialog id="work" aria-label="${S[l].works}"></dialog><dialog id="cart" aria-label="${S[l].cart}"></dialog><script src="/data.js" defer></script><script src="/app.js" defer></script></body></html>`;
 const wrap=(l,P,body,extra='')=>`<body data-p="${P}"${extra}>${HDR(l,P)}<main id="main">${body}</main>${FTR(l)}${tail(l)}`;
@@ -92,6 +92,44 @@ function exhib(l){
   return `<li><span>${e(d)}</span><div><b>${e(nm)}</b>${e(ds)}</div></li>`}).join('');
 }
 const wh=w=>DIM[w.id]||[w.w*10,w.h*10];
+
+/* ── Ilustración médica (datos en med.js, imágenes en img/med/manifest.json, vídeos en video/med/list.json) ── */
+const MD=require('./med.js'),MAN=JSON.parse(fs.readFileSync('img/med/manifest.json','utf8')),VL=JSON.parse(fs.readFileSync('video/med/list.json','utf8').replace(/^﻿/,''));
+const imgs=k=>(MAN[k]||[]).map(x=>({...x,n:x.f.match(/(\d+)\.jpg$/)[1],k})).filter(x=>fs.existsSync(x.f.slice(1)));
+const vids=()=>VL.map(v=>({n:v.n,w:v.w,h:v.h,f:`/video/med/${v.n}.mp4`,p:`/video/med/${v.n}.jpg`}));
+const catOf=k=>MD.CATS.find(c=>c.k===k);
+const murl=(l,k)=>SEG[l].m+(k?catOf(k).slug[l]+'/':'');
+const ttl=(l,x)=>x.k==='pos'&&MD.POS[x.n]?MD.POS[x.n][l]:'';
+const lab=(l,x)=>ttl(l,x)||(catOf(x.k)?catOf(x.k).name[l]:MD.T[l].expH);
+const vttl=(l,v)=>MD.VID[v.n]?MD.VID[v.n][l]:MD.T[l].anim;
+const cnt=k=>k==='ani'?vids().length:imgs(k).length;
+const cover=c=>c.k==='ani'?`/video/med/${c.cover}.jpg`:`/img/med/${c.k}/${c.cover}-t.jpg`;
+const tile=(l,x,i)=>{const cap=ttl(l,x),lb=lab(l,x);return `<figure><a href="${x.f}" data-med data-t="${e(lb)}" aria-label="${e(t(l,'zm')+': '+lb)}"><img src="${x.t}" alt="${e(lb)} · Pere Lluís León" width="${x.w}" height="${x.h}"${i>5?' loading="lazy"':''} decoding="async"></a>${cap?`<figcaption><b>${e(cap)}</b></figcaption>`:''}</figure>`};
+const vtile=(l,v,i)=>{const tt=vttl(l,v);return `<figure class="vt"><a href="${v.f}" data-med data-v="${v.p}" data-t="${e(tt)}" aria-label="${e(MD.T[l].play+': '+tt)}"><img src="${v.p}" alt="${e(tt)}" width="${v.w}" height="${v.h}"${i>5?' loading="lazy"':''} decoding="async"><span class="pl" aria-hidden="true"></span></a><figcaption><b>${e(tt)}</b></figcaption></figure>`};
+const medcta=l=>{const M=MD.T[l];return `<section class="pro"><div><h2>${e(M.ctaH)}</h2><p>${e(M.ctaP)}</p></div><a class="btn lt" href="${SEG[l].c}?motivo=med">${e(M.ctaB)}</a></section>`};
+const medExh=l=>{const K=EXK[l];return EXD.filter(x=>/^med/.test(x[4])).map(x=>`<li><b>${e(x[2])}</b><span>${e([x[3],K[x[4]]].filter(Boolean).join(' — '))}</span></li>`).join('')};
+const imgObj=(x,name)=>({"@type":"ImageObject","contentUrl":SITE+x.f,"name":name,"width":x.w,"height":x.h,"creator":{"@id":SITE+'/#artist'},"creditText":"Pere Lluís León","copyrightNotice":"© Pere Lluís León"});
+function medPages(l){
+ const M=MD.T[l],sg=SEG[l],hero=imgs('hero').slice(0,10),bc=[[t(l,'home'),url(l,'h')],[t(l,'med'),SITE+murl(l)]];
+ const feat=MD.FEAT.map(([k,n])=>imgs(k).find(x=>x.n===n)).filter(Boolean);
+ out[sg.m+'index.html']=head(l,{title:M.title,d:M.d,k:'m',img:hero[0].f,pre:`<link rel="preload" as="image" href="${hero[0].f}" fetchpriority="high">`,schema:[PERSON,crumbs(l,bc),{"@context":"https://schema.org","@type":"ProfessionalService","name":'Pere Lluís León · '+t(l,'med'),"url":SITE+murl(l),"description":M.d,"email":C.email,"telephone":"+34937512087","areaServed":"Worldwide","founder":{"@id":SITE+'/#artist'},"address":PERSON.address,"image":SITE+hero[0].f},{"@context":"https://schema.org","@type":"ImageGallery","name":M.feat,"url":SITE+murl(l),"inLanguage":l,"associatedMedia":feat.map(x=>imgObj(x,lab(l,x)))}]})+wrap(l,'med',
+  `<section class="hv mhv"><div class="mss">${hero.map((x,i)=>`<img src="${x.f}" alt="" width="${x.w}" height="${x.h}"${i?' loading="lazy"':' class="on" fetchpriority="high"'}>`).join('')}</div><div class="hvc"><p class="kick">${e(M.kick)}</p><h1>${t(l,'med')}</h1><p class="hsub">${e(M.lead)}</p><div class="row"><a class="btn lt" href="#areas">${e(M.see)}</a><a class="btn lt alt" href="${sg.c}?motivo=med">${e(M.ord)}</a></div></div></section>`+
+  `<section class="usp">${M.svc.map(s=>`<div><b>${e(s[0])}</b><p>${e(s[1])}</p></div>`).join('')}</section>`+
+  `<section id="areas"><h2 class="sec">${e(M.areas)}</h2><div class="cg mcg">${MD.CATS.map(c=>`<a href="${murl(l,c.k)}"><img src="${cover(c)}" alt="" loading="lazy" decoding="async"><span><b>${e(c.name[l])}</b><small>${cnt(c.k)} ${c.k==='ani'?M.nv:M.n}</small></span></a>`).join('')}</div></section>`+
+  `<section><h2 class="sec">${e(M.feat)}</h2><div class="mg">${feat.map((x,i)=>tile(l,x,i)).join('')}</div></section>`+
+  `<section class="about mpro"><img src="/img/med/estudio.jpg" alt="Pere Lluís León" loading="lazy" width="472" height="393"><div class="stm"><h2 class="sec">${e(M.profH)}</h2>${M.prof.map(p=>`<p>${e(p)}</p>`).join('')}<dl class="mfx">${M.facts.map(f=>`<div><dt>${e(f[0])}</dt><dd>${e(f[1])}</dd></div>`).join('')}</dl></div></section>`+
+  `<section class="mcli"><h2 class="sec">${e(M.cliH)}</h2><div class="mlogo"><img src="/img/med/clientes.jpg" alt="${e(M.cliH+': '+[...MD.HOS.slice(0,4),...MD.PUB.slice(0,4)].join(', '))}…" loading="lazy" width="1400" height="1127"></div><div class="mcl">${[[M.hos,MD.HOS],[M.inst,MD.INST],[M.pub,MD.PUB]].map(([h,a])=>`<div><h3 class="h2">${e(h)}</h3><ul>${a.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`).join('')}</div></section>`+
+  `<section class="mres"><h2 class="sec">${e(M.resH)}</h2><ul>${MD.RES.map(x=>`<li>${e(x)}</li>`).join('')}</ul></section>`+
+  `<section class="mexp"><h2 class="sec">${e(M.expH)}</h2><div class="mstrip">${imgs('expo').map((x,i)=>tile(l,x,i)).join('')}</div><ul class="mel">${medExh(l)}</ul></section>`+
+  medcta(l));
+ for(const c of MD.CATS){
+  const isV=c.k==='ani',items=isV?vids():imgs(c.k),u=murl(l,c.k),paths=Object.fromEntries(LANGS.map(x=>[x,murl(x,c.k)])),nn=`${items.length} ${isV?M.nv:M.n}`;
+  out[u+'index.html']=head(l,{title:M.ct(c.k,c.name[l]),d:`${c.intro[l]} ${nn} · Pere Lluís León.`,k:'m',paths,img:isV?items[0].p:items[0].f,schema:[crumbs(l,[...bc,[c.name[l],SITE+u]]),{"@context":"https://schema.org","@type":isV?"CollectionPage":"ImageGallery","name":c.name[l],"description":c.intro[l],"url":SITE+u,"inLanguage":l,"author":{"@id":SITE+'/#artist'},...(isV?{}:{"associatedMedia":items.map(x=>imgObj(x,lab(l,x)))})}]})+wrap(l,'med',
+   `<nav class="bc" aria-label="Breadcrumb"><a href="${sg.h}">${t(l,'home')}</a> › <a href="${sg.m}">${t(l,'med')}</a> › <span aria-current="page">${e(c.name[l])}</span></nav><section class="mh"><p class="kick">${e(M.kick)}</p><h1>${e(c.name[l])}</h1><p class="lead">${e(c.intro[l])}</p><p class="mn">${nn}</p></section>`+
+   `<div class="mg${isV?' mgv':''}">${items.map((x,i)=>isV?vtile(l,x,i):tile(l,x,i)).join('')}</div>`+
+   `<nav class="moth" aria-label="${e(M.other)}"><h2 class="sec">${e(M.other)}</h2><div class="row"><a class="chip" href="${sg.m}">← ${e(M.all)}</a>${MD.CATS.filter(o=>o.k!==c.k).map(o=>`<a class="chip" href="${murl(l,o.k)}">${e(o.name[l])}</a>`).join('')}</div></nav>`+medcta(l));
+ }
+}
 
 /* ── Páginas ── */
 const out={};
@@ -111,13 +149,7 @@ for(const l of LANGS){
  const B=BIO[l];
  out[sg.a+'index.html']=head(l,{title:Xl.artist[0],d:B.lead,k:'a',img:'/img/perfil.jpg',og:'profile',schema:[PERSON,crumbs(l,[[t(l,'home'),url(l,'h')],[t(l,'artist'),url(l,'a')]])]})+wrap(l,'artist',
   `<section class="bio"><img src="/img/perfil.jpg" alt="Pere Lluís León, ${l==='en'?'painter':l==='fr'?'peintre':'pintor'}" width="420" height="525"><div id="bb"><h1>${t(l,'artist')}</h1><p class="lead">${e(B.lead)}</p><h2 class="h2">${e(B.h)}</h2>${B.ps.map(p=>`<p>${e(p)}</p>`).join('')}<p>${lk(t(l,'alt'),l)}</p><blockquote class="stm"><p>${e(q[1])}</p><p class="sig">${e(q[3])}</p></blockquote><a class="btn" href="${sg.c}">${t(l,'bc')}</a></div></section><section class="exs"><h2 class="sec">${e(B.exh)}</h2><ul class="exl">${exhib(l)}</ul></section>${pro(l)}`);
- // Ilustración médica
- const M=MEDT[l];
- out[sg.m+'index.html']=head(l,{title:M.title,d:M.d,k:'m',img:'/img/med/neuronas.jpg',schema:[PERSON,crumbs(l,[[t(l,'home'),url(l,'h')],[t(l,'med'),url(l,'m')]]),{"@context":"https://schema.org","@type":"ImageGallery","name":t(l,'med'),"description":M.d,"url":url(l,'m'),"inLanguage":l,"author":{"@id":SITE+'/#artist'},"associatedMedia":MEDW.map(m=>({"@type":"ImageObject","contentUrl":`${SITE}/img/med/${m[0]}.jpg`,"name":m[4][l],"width":m[2],"height":m[3],"creator":{"@id":SITE+'/#artist'},"creditText":"Pere Lluís León","copyrightNotice":"© Pere Lluís León"}))}]})+wrap(l,'med',
-  `<section class="mh"><p class="kick">${e(M.kick)}</p><h1>${t(l,'med')}</h1><p class="lead">${e(M.lead)}</p>${M.ps.map(p=>`<p>${e(p)}</p>`).join('')}</section>`+
-  `<section><h2 class="sec">${e(M.gal)}</h2><div class="mg">${MEDW.map((m,i)=>{const tt=m[4][l];return `<figure><a href="/img/med/${m[0]}.jpg" data-med data-t="${e(tt)}" aria-label="${e(t(l,'zm')+': '+tt)}"><img src="/img/med/${m[0]}-t.jpg" alt="${e(tt)} · Pere Lluís León" width="${m[2]}" height="${m[3]}"${i>2?' loading="lazy"':''} decoding="async"></a><figcaption><b>${e(tt)}</b><small>${e(MEDC[m[1]][l])}</small></figcaption></figure>`}).join('')}</div></section>`+
-  `<section class="mcl"><div><h2 class="h2">${e(M.pub)}</h2><ul>${MEDPUB.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div><div><h2 class="h2">${e(M.hos)}</h2><ul>${MEDHOS.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div></section>`+
-  `<section class="pro"><div><h2>${e(M.ctaH)}</h2><p>${e(M.ctaP)}</p></div><div class="row"><a class="btn lt" href="${sg.c}?motivo=med">${e(M.ctaB)}</a><a class="btn lt alt" href="${MED}/animaciones" rel="noopener">${e(M.more)}</a></div></section>`);
+ medPages(l);
  // Contacto
  out[sg.c+'index.html']=head(l,{title:Xl.contact[0],d:Xl.contact[1],k:'c',img:'/img/perfil.jpg',schema:[PERSON,crumbs(l,[[t(l,'home'),url(l,'h')],[t(l,'contact'),url(l,'c')]])]})+wrap(l,'contact',
   `<section class="ctc"><div><h1>${t(l,'contact')}</h1><p>${e(t(l,'cin'))}</p><ul class="cl"><li><b>${t(l,'mail')}</b><a href="mailto:${C.email}">${C.email}</a></li><li><b>${t(l,'tel')}</b><a href="tel:+34937512087">+34 93 751 20 87</a></li><li><b>${t(l,'st')}</b>Premià de Mar, Barcelona</li><li><b>${t(l,'hr')}</b>${t(l,'hrv')}</li><li>${SOC}</li></ul><div class="pbox"><b>${t(l,'proH')}</b><p>${t(l,'proP')}</p></div></div><form id="cf"><label>${t(l,'rs')}<select name="r">${['r1','r2','r3','r4','r5','r6'].map(k=>`<option>${t(l,k)}</option>`).join('')}</select></label><label>${t(l,'nm')}<input name="n" required autocomplete="name"></label><label>${t(l,'mail')}<input name="m" type="email" required autocomplete="email"></label><label>${t(l,'msg').replace(/\s*\(.*\)/,'')}<textarea name="g" rows="6" required></textarea></label><button class="btn">${t(l,'sm')}</button><p class="nt" id="cs" role="status"></p></form></section>`);
@@ -156,8 +188,9 @@ fs.writeFileSync('catalog.json',JSON.stringify({updated:TODAY,currency:'EUR',shi
 const xl=(k,id)=>LANGS.map(l=>`<xhtml:link rel="alternate" hreflang="${l}" href="${url(l,k,id)}"/>`).join('')+`<xhtml:link rel="alternate" hreflang="x-default" href="${url('en',k,id)}"/>`;
 let sm=`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n<url><loc>${SITE}/</loc>${xl('h').replace(url('en','h'),SITE+'/')}<lastmod>${TODAY}</lastmod></url>\n`;
 const pri={h:'1.0',w:'0.9',a:'0.6',m:'0.7',c:'0.5'};
-for(const l of LANGS){for(const k of ['h','w','a','m','c'])sm+=`<url><loc>${url(l,k)}</loc>${xl(k)}<lastmod>${TODAY}</lastmod><priority>${pri[k]}</priority>${k==='m'?MEDW.map(m=>`<image:image><image:loc>${SITE}/img/med/${m[0]}.jpg</image:loc><image:title>${e(m[4][l])}</image:title></image:image>`).join(''):''}</url>\n`;
+for(const l of LANGS){for(const k of ['h','w','a','m','c'])sm+=`<url><loc>${url(l,k)}</loc>${xl(k)}<lastmod>${TODAY}</lastmod><priority>${pri[k]}</priority></url>\n`;
  for(const w of W)sm+=`<url><loc>${url(l,'w',w.id)}</loc>${xl('w',w.id)}<lastmod>${TODAY}</lastmod><priority>0.8</priority><image:image><image:loc>${SITE}/img/f/${w.id}.jpg</image:loc><image:title>${e(w.t)}</image:title><image:caption>${e(altx(l,w))}</image:caption></image:image></url>\n`}
+for(const l of LANGS)for(const c of MD.CATS){const P=Object.fromEntries(LANGS.map(x=>[x,murl(x,c.k)]));sm+=`<url><loc>${SITE+P[l]}</loc>${LANGS.map(x=>`<xhtml:link rel="alternate" hreflang="${x}" href="${SITE+P[x]}"/>`).join('')}<xhtml:link rel="alternate" hreflang="x-default" href="${SITE+P.en}"/><lastmod>${TODAY}</lastmod><priority>0.6</priority>${c.k==='ani'?'':imgs(c.k).map(x=>`<image:image><image:loc>${SITE+x.f}</image:loc></image:image>`).join('')}</url>\n`}
 fs.writeFileSync('sitemap.xml',sm+'</urlset>\n');
 fs.writeFileSync('robots.txt',`User-agent: *\nAllow: /\nDisallow: /*/gracias/\nDisallow: /*/gracies/\nDisallow: /*/thank-you/\nDisallow: /*/merci/\n\nUser-agent: AhrefsBot\nDisallow: /\n\nUser-agent: SemrushBot\nDisallow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
 console.log(Object.keys(out).length+' páginas + sitemap.xml ('+(sm.match(/<url>/g)||[]).length+' URLs) + robots.txt + catalog.json');
