@@ -58,7 +58,7 @@ select{background:var(--card);border:1px solid var(--line);border-radius:var(--r
 .car{position:relative}
 body[data-p=home] #grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:var(--pad);gap:1.2rem;scrollbar-width:none;padding-bottom:1.5rem}
 body[data-p=home] #grid::-webkit-scrollbar{display:none}
-body[data-p=home] .card{flex:0 0 min(270px,74vw);scroll-snap-align:start}
+body[data-p=home] .card{flex:0 0 min(270px,74vw);scroll-snap-align:start;align-self:flex-start}
 .cv{position:absolute;top:36%;z-index:2;width:2.8rem;height:2.8rem;border-radius:50%;border:0;background:#fff;color:var(--wall);font-size:1.2rem;box-shadow:0 2px 12px rgba(0,0,0,.4);transition:background .2s,color .2s}
 .cv:hover{background:var(--wine2);color:var(--on)}.cv[data-dir="-1"]{left:clamp(.4rem,2vw,1.4rem)}.cv[data-dir="1"]{right:clamp(.4rem,2vw,1.4rem)}
 .cols{padding-bottom:2rem}
@@ -81,12 +81,12 @@ body[data-p=home] .card{flex:0 0 min(270px,74vw);scroll-snap-align:start}
 .chip{border:1px solid var(--line);background:transparent;border-radius:var(--r);font-size:.88rem;padding:.45rem 1rem;transition:border-color .2s}
 .chip:hover{border-color:var(--hi)}.chip[aria-pressed=true]{background:var(--wine);border-color:var(--wine);color:var(--on)}
 .bar .n{margin-left:auto;color:var(--mute);font-size:.95rem}
-#grid,#rel{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.6rem 1.2rem;padding:0 var(--pad) 3rem}
+#grid,#rel{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.6rem 1.2rem;align-items:start;padding:0 var(--pad) 3rem}
 .card{display:flex;flex-direction:column;position:relative;transition:transform .25s}
 .card:hover{transform:translateY(-3px)}
 /* La obra se ve entera (sin recortes) sobre un paspartú oscuro */
-.card .im{display:flex;align-items:flex-end;justify-content:center;aspect-ratio:4/5;position:relative;overflow:hidden}
-.card .im img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transition:transform .5s}
+.card .im{display:block;position:relative;overflow:hidden}
+.card .im img{display:block;width:100%;height:auto;transition:transform .5s}
 .card:hover .im img{transform:scale(1.03)}
 .card.sold .im img{filter:grayscale(.7) opacity(.7)}
 .card .cap{display:grid;gap:.4rem;padding:.8rem 0 1rem}
@@ -220,7 +220,7 @@ footer a{color:var(--ink)}footer b{display:block;color:var(--ink);margin-bottom:
  .cb{padding:.55rem 1rem}.bar{position:static;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-bottom:.4rem}.bar::-webkit-scrollbar{display:none}.chip,#zs{flex:none;white-space:nowrap}.bar .n{flex:none;margin-left:.4rem}
  .cv{display:none}.bio,.ctc{grid-template-columns:1fr}.bio img{position:static;max-width:340px}
  .exl li{grid-template-columns:1fr;gap:.2rem}.card h3 a:after{bottom:3.2rem}
- #grid,#rel{grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem .7rem}.card .im{padding:.6rem}.card .cap{padding:.7rem .7rem .9rem}.card .pp{flex-wrap:wrap}
+ #grid,#rel{grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem .7rem}.card .cap{padding:.6rem 0 .9rem}.card .pp{flex-wrap:wrap}
  body[data-p=home] #grid{display:flex}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
