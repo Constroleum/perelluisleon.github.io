@@ -217,8 +217,12 @@ if(P==='contact'){const w=by[Q.get('obra')],g=$('#cf [name=g]'),r=$('#cf [name=r
  if(w&&g&&!g.value){g.value=t('askm').replace('%s',`${w.t} (${dmx(w)})`);if(r)r.value=t('r1')}
  if(Q.get('motivo')==='pro'&&r)r.value=t('r2');if(Q.get('motivo')==='med'&&r)r.value=t('r6')}
 if(P==='thanks'){cart=[];save()}
-/* Con Stripe activo: obras vendidas desde el último build (marcadas por el webhook) */
-if(stripe())fetch(C.endpoint.replace(/\/checkout$/,'/sold')).then(r=>r.json()).then(j=>{(j.sold||[]).forEach(i=>{if(by[i])by[i].s=true});
+/* Con Stripe activo: precios cambiados en el panel y obras vendidas desde el último build (panel o webhook) */
+if(stripe())fetch(C.endpoint.replace(/\/checkout$/,'/state')).then(r=>r.json()).then(j=>{
+ Object.entries(j.prices||{}).forEach(([i,v])=>{if(!by[i]||!(v>0))return;PR[i]=v;
+  $$(`[data-qa="${i}"]`).forEach(b=>{const x=b.parentNode.querySelector('b');if(x)x.textContent=fmt(v)});
+  if(P==='work'&&document.body.dataset.w===i){const x=$('.inf .pr');if(x)x.textContent=fmt(v)}});
+ (j.sold||[]).forEach(i=>{if(by[i])by[i].s=true});
  cart=cart.filter(i=>!by[i].s);save();$$('[data-qa],[data-add],[data-now]').forEach(b=>{const w=by[b.dataset.qa||b.dataset.add||b.dataset.now];if(w&&w.s)b.replaceWith(Object.assign(document.createElement('span'),{className:'so',textContent:t('sold')}))});sync()}).catch(()=>{});
 if(Q.get('pago')==='cancelado'){openCart();$('#cart h2').insertAdjacentHTML('afterend',`<p class="note">${t('cancel')}</p>`)}
 sync();

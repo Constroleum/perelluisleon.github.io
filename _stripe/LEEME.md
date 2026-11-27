@@ -100,6 +100,31 @@ Para probar, haz una compra con la tarjeta `4242 4242 4242 4242` en modo de prue
 
 Además, puedes activar en Stripe (**Configuración → Correos electrónicos de clientes → Pagos correctos**) el recibo oficial de Stripe, que se enviará además de esta confirmación.
 
+## 7. Panel de gestión (precios y obras vendidas)
+
+Un panel privado, con usuario y contraseña, para:
+
+- **Cambiar el precio** de cualquier obra. Se aplica al instante en el pago y en la web, sin regenerar nada. «Volver al precio base» recupera el precio de `app.js`.
+- **Marcar una obra como vendida** (por ejemplo, si la vendes en una exposición) o **volver a ponerla a la venta**.
+- Ver qué obras **se han vendido por la web**: Stripe las marca solas, con la fecha y el email del comprador.
+
+Necesita el KV `SOLD` (paso 2). Para activarlo:
+
+```bash
+npx wrangler secret put ADMIN_USER
+npx wrangler secret put ADMIN_PASS
+npx wrangler deploy
+```
+
+Elige una contraseña larga (12 caracteres o más). Tras 10 intentos fallidos, esa conexión queda bloqueada 15 minutos.
+
+El panel queda en `https://pll-stripe.TU-SUBDOMINIO.workers.dev/admin`. Para usar **admin.perelluisleon.art**:
+
+1. El DNS del dominio tiene que estar en Cloudflare (plan gratuito): **Add a site → perelluisleon.art**, y cambia los servidores DNS en tu registrador por los que te indique Cloudflare. Copia antes los registros actuales de GitHub Pages (Cloudflare suele importarlos solo). La web sigue alojada en GitHub Pages.
+2. En `wrangler.toml`, quita los `#` de las tres líneas `[[routes]]` y ejecuta `npx wrangler deploy`. Cloudflare crea el subdominio y su certificado automáticamente.
+
+**Cómo se ve en la web:** las páginas llevan el precio del último `node build.js`. Al cargar, la web consulta el panel y actualiza los precios y las obras vendidas en pantalla, y el pago cobra siempre el precio del panel. Google ve el precio de la página generada, así que de vez en cuando conviene pasar los cambios a `app.js` y `data.js` y regenerar.
+
 ## Después de cada venta
 
 Recibirás el aviso de venta (paso 6) y Stripe también te envía un correo con el pedido. Para que la obra salga como vendida de forma permanente (también en Google):
