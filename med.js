@@ -74,7 +74,7 @@ es:{title:'Ilustración médica y científica | Pere Lluís León, ilustrador m�
  facts:[['Formación','Bellas artes · Escola Massana · Llotja'],['Por cuenta propia','Desde 1992'],['Herramientas','Illustrator · Photoshop · Animate · PowerPoint'],['Idiomas','Catalán · castellano · francés · inglés · italiano']],
  cliH:'Clientes',hos:'Hospitales y clínicas',inst:'Universidades e instituciones',pub:'Editoriales y revistas',resH:'Créditos en investigación',expH:'Exposiciones de arte médico',
  ctaH:'¿Tienes un proyecto?',ctaP:'Ilustración médica, quirúrgica o científica para publicaciones, docencia, congresos o divulgación. Cuéntanos qué necesitas.',ctaB:'Escribir al ilustrador',
- other:'Otras áreas',all:'Ilustración médica',ct:(n,t)=>`${t} — ilustración médica | Pere Lluís León`,cd:(n,i)=>`${i} ${n} de Pere Lluís León, ilustrador médico y científico en Barcelona.`,anim:'Animación 2D',play:'Reproducir'},
+ other:'Otras áreas',all:'Ilustración médica y científica',ct:(n,t)=>`${t} — ilustración médica | Pere Lluís León`,cd:(n,i)=>`${i} ${n} de Pere Lluís León, ilustrador médico y científico en Barcelona.`,anim:'Animación 2D',play:'Reproducir'},
 ca:{title:'Il·lustració mèdica i científica | Pere Lluís León, il·lustrador mèdic a Barcelona',d:'Pere Lluís León, il·lustrador mèdic i científic a Barcelona: anatomia, cirurgia, recerca biomèdica, ciències naturals, veterinària i animació 2D per a hospitals, editorials mèdiques i revistes especialitzades.',
  kick:'Il·lustrador mèdic i científic',lead:'Més de tres dècades creant il·lustracions mèdiques per a hospitals, facultats de medicina, llibres i revistes especialitzades, presentacions i animacions 2D.',
  see:'Veure els treballs',ord:'Encarregar una il·lustració',
@@ -84,7 +84,7 @@ ca:{title:'Il·lustració mèdica i científica | Pere Lluís León, il·lustrad
  facts:[['Formació','Belles arts · Escola Massana · Llotja'],['Pel seu compte','Des del 1992'],['Eines','Illustrator · Photoshop · Animate · PowerPoint'],['Idiomes','Català · castellà · francès · anglès · italià']],
  cliH:'Clients',hos:'Hospitals i clíniques',inst:'Universitats i institucions',pub:'Editorials i revistes',resH:'Crèdits en recerca',expH:'Exposicions d’art mèdic',
  ctaH:'Tens un projecte?',ctaP:'Il·lustració mèdica, quirúrgica o científica per a publicacions, docència, congressos o divulgació. Explica’ns què necessites.',ctaB:'Escriure a l’il·lustrador',
- other:'Altres àrees',all:'Il·lustració mèdica',ct:(n,t)=>`${t} — il·lustració mèdica | Pere Lluís León`,cd:(n,i)=>`${i} ${n} de Pere Lluís León, il·lustrador mèdic i científic a Barcelona.`,anim:'Animació 2D',play:'Reproduir'},
+ other:'Altres àrees',all:'Il·lustració mèdica i científica',ct:(n,t)=>`${t} — il·lustració mèdica | Pere Lluís León`,cd:(n,i)=>`${i} ${n} de Pere Lluís León, il·lustrador mèdic i científic a Barcelona.`,anim:'Animació 2D',play:'Reproduir'},
 en:{title:'Medical & Scientific Illustration | Pere Lluís León, Medical Illustrator in Barcelona',d:'Pere Lluís León, medical and scientific illustrator in Barcelona: anatomy, surgery, biomedical research, natural sciences, veterinary and 2D animation for hospitals, medical publishers and specialist journals.',
  kick:'Medical & scientific illustrator',lead:'More than three decades of medical illustration for hospitals, medical schools, books and specialist journals, presentations and 2D animation.',
  see:'See the work',ord:'Commission an illustration',
@@ -94,7 +94,7 @@ en:{title:'Medical & Scientific Illustration | Pere Lluís León, Medical Illust
  facts:[['Training','Fine arts · Escola Massana · Llotja'],['Freelance','Since 1992'],['Tools','Illustrator · Photoshop · Animate · PowerPoint'],['Languages','Catalan · Spanish · French · English · Italian']],
  cliH:'Clients',hos:'Hospitals and clinics',inst:'Universities and institutions',pub:'Publishers and journals',resH:'Research credits',expH:'Medical art exhibitions',
  ctaH:'Have a project in mind?',ctaP:'Medical, surgical or scientific illustration for publications, teaching, conferences or public outreach. Tell us what you need.',ctaB:'Write to the illustrator',
- other:'Other areas',all:'Medical illustration',ct:(n,t)=>`${t} — Medical Illustration | Pere Lluís León`,cd:(n,i)=>`${i} ${n} by Pere Lluís León, medical and scientific illustrator in Barcelona.`,anim:'2D animation',play:'Play'},
+ other:'Other areas',all:'Medical & scientific illustration',ct:(n,t)=>`${t} — Medical Illustration | Pere Lluís León`,cd:(n,i)=>`${i} ${n} by Pere Lluís León, medical and scientific illustrator in Barcelona.`,anim:'2D animation',play:'Play'},
 fr:{title:'Illustration médicale et scientifique | Pere Lluís León, illustrateur médical à Barcelone',d:'Pere Lluís León, illustrateur médical et scientifique à Barcelone : anatomie, chirurgie, recherche biomédicale, sciences naturelles, vétérinaire et animation 2D pour hôpitaux, éditeurs médicaux et revues spécialisées.',
  kick:'Illustrateur médical et scientifique',lead:'Plus de trois décennies d’illustration médicale pour hôpitaux, facultés de médecine, livres et revues spécialisées, présentations et animations 2D.',
  see:'Voir les travaux',ord:'Commander une illustration',
@@ -104,6 +104,6 @@ fr:{title:'Illustration médicale et scientifique | Pere Lluís León, illustrat
  facts:[['Formation','Beaux-arts · Escola Massana · Llotja'],['Indépendant','Depuis 1992'],['Outils','Illustrator · Photoshop · Animate · PowerPoint'],['Langues','Catalan · espagnol · français · anglais · italien']],
  cliH:'Clients',hos:'Hôpitaux et cliniques',inst:'Universités et institutions',pub:'Éditeurs et revues',resH:'Crédits en recherche',expH:'Expositions d’art médical',
  ctaH:'Un projet en tête ?',ctaP:'Illustration médicale, chirurgicale ou scientifique pour publications, enseignement, congrès ou vulgarisation. Dites-nous ce dont vous avez besoin.',ctaB:'Écrire à l’illustrateur',
- other:'Autres domaines',all:'Illustration médicale',ct:(n,t)=>`${t} — illustration médicale | Pere Lluís León`,cd:(n,i)=>`${i} ${n} de Pere Lluís León, illustrateur médical et scientifique à Barcelone.`,anim:'Animation 2D',play:'Lire'}};
+ other:'Autres domaines',all:'Illustration médicale et scientifique',ct:(n,t)=>`${t} — illustration médicale | Pere Lluís León`,cd:(n,i)=>`${i} ${n} de Pere Lluís León, illustrateur médical et scientifique à Barcelone.`,anim:'Animation 2D',play:'Lire'}};
 
 module.exports={CATS,POS,VID,FEAT,HOS,INST,PUB,RES,T};
