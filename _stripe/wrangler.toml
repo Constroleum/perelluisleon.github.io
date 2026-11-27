@@ -6,6 +6,9 @@ compatibility_date = "2026-11-01"
 [vars]
 SITE = "https://perelluisleon.art"
 ALLOWED_ORIGINS = "https://perelluisleon.art,https://www.perelluisleon.art"
+# Emails de confirmación (ver LEEME.md, paso 6). El remitente debe ser de un dominio verificado en Resend.
+MAIL_FROM = "Pere Lluís León <pedidos@perelluisleon.art>"
+MAIL_ADMIN = "ilust.medical@gmail.com"
 
 # Obras vendidas (evita vender dos veces una pieza única). Crea el espacio con:
 #   npx wrangler kv namespace create SOLD

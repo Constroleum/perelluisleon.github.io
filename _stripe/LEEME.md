@@ -77,9 +77,32 @@ Después ejecuta `node build.js` (así la FAQ explica el pago con tarjeta) y pub
 3. Borra la marca de vendida de la prueba: Cloudflare → Workers → KV → SOLD → elimina la clave de esa obra.
 4. Para cobrar de verdad: `npx wrangler secret put STRIPE_SECRET_KEY` con la clave `sk_live_…` y crea el webhook también en **modo real** (con su propio `whsec_…`).
 
+## 6. Emails de confirmación
+
+Cuando un pago se completa, el Worker envía dos correos:
+
+- **Al comprador**, en su idioma (es/ca/en/fr): las obras compradas con su imagen, el envío, el total pagado y la dirección de envío, con la explicación de que el artista le escribirá para coordinar el envío. Si responde, la respuesta llega a `MAIL_ADMIN`.
+- **A `MAIL_ADMIN`** (ilust.medical@gmail.com): aviso de venta con las obras, el nombre, el email, el teléfono, la dirección, el mensaje del cliente y el enlace al pago en Stripe.
+
+Se envían con **Resend** (plan gratuito: 3.000 correos al mes):
+
+1. Crea una cuenta en <https://resend.com>.
+2. **Domains → Add domain** → `perelluisleon.art`, y añade en el DNS del dominio los registros que te indique (SPF y DKIM). Sin esto los correos irían a spam o no saldrían.
+3. **API Keys → Create API key** (permiso «Sending access») y guárdala en el Worker:
+
+```bash
+npx wrangler secret put RESEND_API_KEY
+```
+
+4. Revisa `MAIL_FROM` y `MAIL_ADMIN` en `wrangler.toml` y vuelve a publicar con `npx wrangler deploy`.
+
+Para probar, haz una compra con la tarjeta `4242 4242 4242 4242` en modo de prueba usando tu propio email. Si falta `RESEND_API_KEY`, no se envía ningún correo y el resto funciona igual. Con el KV `SOLD` activo, cada pedido se envía una sola vez aunque Stripe repita el aviso.
+
+Además, puedes activar en Stripe (**Configuración → Correos electrónicos de clientes → Pagos correctos**) el recibo oficial de Stripe, que se enviará además de esta confirmación.
+
 ## Después de cada venta
 
-Stripe te envía un correo con el pedido, la dirección de envío y el teléfono del cliente. Para que la obra salga como vendida de forma permanente (también en Google):
+Recibirás el aviso de venta (paso 6) y Stripe también te envía un correo con el pedido. Para que la obra salga como vendida de forma permanente (también en Google):
 
 1. En `data.js`, pon `"s":true` en esa obra.
 2. Ejecuta `node build.js` y publica.
